@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HappyFace — Dein stiller Begleiter für mehr Wohlbefinden im HomeOffice</title>
+  <meta name="description" content="HappyFace analysiert deine Mimik in Echtzeit und hilft dir, bewusst positiv zu bleiben. Wissenschaftlich fundiert. 100% lokal. Für macOS.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,500;0,9..40,700&display=swap" rel="stylesheet">
+  <style>
+    /* ═══════════════════════════════════════════
+       HappyFace Landing Page
+       ═══════════════════════════════════════════ */
+
+    :root {
+      --bg: #0a0d14;
+      --bg-section: #0f1219;
+      --bg-card: #161b27;
+      --border: #1e2536;
+      --text: #e2e8f0;
+      --text-dim: #94a3b8;
+      --text-muted: #64748b;
+      --emerald: #34d399;
+      --emerald-dim: rgba(52, 211, 153, 0.12);
+      --amber: #fbbf24;
+      --red: #f87171;
+      --purple: #a78bfa;
+      --radius: 16px;
+      --max-w: 960px;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html {
+      scroll-behavior: smooth;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    body {
+      font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    /* ─── Utilities ─── */
+    .container { max-width: var(--max-w); margin: 0 auto; padding: 0 24px; }
+    .section { padding: 100px 0; }
+    .section-alt { background: var(--bg-section); }
+    .text-dim { color: var(--text-dim); }
+    .text-muted { color: var(--text-muted); }
+    .text-emerald { color: var(--emerald); }
+    .text-center { text-align: center; }
+
+    .badge {
+      display: inline-block;
+      padding: 4px 14px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      border: 1px solid rgba(52, 211, 153, 0.25);
+      color: var(--emerald);
+      background: var(--emerald-dim);
+      margin-bottom: 20px;
+    }
+
+    h1 {
+      font-size: clamp(2.2rem, 5vw, 3.4rem);
+      font-weight: 700;
+      line-height: 1.15;
+      letter-spacing: -0.02em;
+      margin-bottom: 20px;
+    }
+
+    h2 {
+      font-size: clamp(1.6rem, 3.5vw, 2.2rem);
+      font-weight: 700;
+      line-height: 1.2;
+      letter-spacing: -0.015em;
+      margin-bottom: 16px;
+    }
+
+    h3 {
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    p.lead {
+      font-size: clamp(1rem, 2vw, 1.2rem);
+      color: var(--text-dim);
+      max-width: 560px;
+      line-height: 1.7;
+    }
+
+    /* ─── Buttons ─── */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 14px 28px;
+      border: none;
+      border-radius: 12px;
+      font-family: inherit;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-decoration: none;
+    }
+
+    .btn-primary {
+      background: var(--emerald);
+      color: #0a0d14;
+    }
+    .btn-primary:hover {
+      background: #2dd4a3;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 30px rgba(52, 211, 153, 0.25);
+    }
+
+    .btn-ghost {
+      background: transparent;
+      color: var(--text-dim);
+      border: 1px solid var(--border);
+    }
+    .btn-ghost:hover {
+      border-color: var(--text-muted);
+      color: var(--text);
+    }
+
+    /* ─── Nav ─── */
+    nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      padding: 16px 0;
+      background: rgba(10, 13, 20, 0.85);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(30, 37, 54, 0.6);
+    }
+
+    nav .container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .nav-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text);
+      text-decoration: none;
+    }
+
+    .nav-brand span { font-size: 22px; }
+
+    .nav-links { display: flex; gap: 8px; }
+    .nav-links a {
+      padding: 8px 16px;
+      color: var(--text-dim);
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 500;
+      border-radius: 8px;
+      transition: all 0.15s;
+    }
+    .nav-links a:hover { color: var(--text); background: rgba(255,255,255,0.04); }
+
+    /* ═══ HERO ═══ */
+    .hero {
+      padding-top: 140px;
+      padding-bottom: 100px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: -200px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 800px;
+      height: 800px;
+      background: radial-gradient(circle, rgba(52, 211, 153, 0.08) 0%, transparent 65%);
+      pointer-events: none;
+    }
+
+    .hero .lead { margin: 0 auto 36px; }
+
+    .hero-buttons { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+
+    /* Animated emoji ring */
+    .emoji-ring {
+      position: relative;
+      width: 160px;
+      height: 160px;
+      margin: 0 auto 40px;
+    }
+
+    .emoji-ring .center-emoji {
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 56px;
+      animation: pulse-emoji 3s ease-in-out infinite;
+    }
+
+    .emoji-ring .orbit-emoji {
+      position: absolute;
+      font-size: 24px;
+      animation: orbit 12s linear infinite;
+    }
+
+    .emoji-ring .orbit-emoji:nth-child(2) { animation-delay: 0s; }
+    .emoji-ring .orbit-emoji:nth-child(3) { animation-delay: -2s; }
+    .emoji-ring .orbit-emoji:nth-child(4) { animation-delay: -4s; }
+    .emoji-ring .orbit-emoji:nth-child(5) { animation-delay: -6s; }
+    .emoji-ring .orbit-emoji:nth-child(6) { animation-delay: -8s; }
+    .emoji-ring .orbit-emoji:nth-child(7) { animation-delay: -10s; }
+
+    @keyframes pulse-emoji {
+      0%, 100% { transform: translate(-50%, -50%) scale(1); }
+      50% { transform: translate(-50%, -50%) scale(1.1); }
+    }
+
+    @keyframes orbit {
+      0%   { top: 0%;  left: 50%; transform: translate(-50%, -50%); }
+      16%  { top: 20%; left: 97%; transform: translate(-50%, -50%); }
+      33%  { top: 80%; left: 97%; transform: translate(-50%, -50%); }
+      50%  { top: 100%;left: 50%; transform: translate(-50%, -50%); }
+      66%  { top: 80%; left: 3%;  transform: translate(-50%, -50%); }
+      83%  { top: 20%; left: 3%;  transform: translate(-50%, -50%); }
+      100% { top: 0%;  left: 50%; transform: translate(-50%, -50%); }
+    }
+
+    /* ═══ PROBLEM ═══ */
+    .problem-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 20px;
+      margin-top: 40px;
+    }
+
+    .problem-card {
+      padding: 28px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+    }
+
+    .problem-card .icon {
+      font-size: 32px;
+      margin-bottom: 16px;
+      display: block;
+    }
+
+    .problem-card p {
+      color: var(--text-dim);
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    /* ═══ SCIENCE ═══ */
+    .science-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+      margin-top: 40px;
+    }
+
+    .science-card {
+      padding: 32px 28px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .science-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+    }
+
+    .science-card:nth-child(1)::before { background: var(--emerald); }
+    .science-card:nth-child(2)::before { background: var(--amber); }
+    .science-card:nth-child(3)::before { background: var(--purple); }
+
+    .science-stat {
+      font-size: 2.4rem;
+      font-weight: 700;
+      line-height: 1;
+      margin-bottom: 8px;
+    }
+
+    .science-card h3 {
+      font-size: 15px;
+      margin-bottom: 10px;
+    }
+
+    .science-card p {
+      color: var(--text-dim);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .science-source {
+      display: inline-block;
+      margin-top: 14px;
+      font-size: 11px;
+      color: var(--text-muted);
+      padding: 3px 10px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      text-decoration: none;
+      transition: all 0.15s;
+    }
+
+    .science-source:hover {
+      border-color: var(--text-muted);
+      color: var(--text-dim);
+    }
+
+    /* ═══ FEATURES ═══ */
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-top: 40px;
+    }
+
+    .feature-card {
+      padding: 28px 24px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      text-align: center;
+      transition: all 0.2s ease;
+    }
+
+    .feature-card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(52, 211, 153, 0.2);
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+    }
+
+    .feature-icon {
+      font-size: 36px;
+      margin-bottom: 16px;
+      display: block;
+    }
+
+    .feature-card h3 { font-size: 14px; }
+
+    .feature-card p {
+      font-size: 13px;
+      color: var(--text-dim);
+      line-height: 1.5;
+      margin-top: 6px;
+    }
+
+    /* ═══ APP PREVIEW ═══ */
+    .preview-section { text-align: center; }
+
+    .app-screenshot {
+      display: inline-block;
+      margin-top: 48px;
+      max-width: 420px;
+      width: 100%;
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(52, 211, 153, 0.08);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .app-screenshot:hover {
+      transform: translateY(-6px) scale(1.02);
+      box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(52, 211, 153, 0.15);
+    }
+
+    /* ═══ CTA FOOTER ═══ */
+    .cta-section {
+      text-align: center;
+      padding: 80px 0 60px;
+      position: relative;
+    }
+
+    .cta-section::before {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 600px;
+      height: 400px;
+      background: radial-gradient(circle, rgba(52, 211, 153, 0.06) 0%, transparent 65%);
+      pointer-events: none;
+    }
+
+    .cta-section h2 { margin-bottom: 12px; }
+    .cta-section .lead { margin: 0 auto 32px; }
+
+    footer {
+      padding: 32px 0;
+      border-top: 1px solid var(--border);
+      text-align: center;
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    footer a { color: var(--text-dim); text-decoration: none; }
+    footer a:hover { color: var(--text); }
+
+    /* ═══ ANIMATIONS ═══ */
+    .fade-in {
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+
+    .fade-in.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ═══ RESPONSIVE ═══ */
+    @media (max-width: 640px) {
+      .section { padding: 64px 0; }
+      .hero { padding-top: 110px; padding-bottom: 64px; }
+      .nav-links { display: none; }
+      .problem-grid, .science-grid, .features-grid { grid-template-columns: 1fr; }
+      .app-screenshot { max-width: 300px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ═══ NAV ═══ -->
+  <nav>
+    <div class="container">
+      <a href="#" class="nav-brand"><span>☺</span> HappyFace</a>
+      <div class="nav-links">
+        <a href="#wissenschaft">Wissenschaft</a>
+        <a href="#features">Features</a>
+        <a href="https://github.com/langner030/happyface" target="_blank" rel="noopener" class="btn btn-ghost" style="padding: 8px 20px; font-size: 13px;">GitHub</a>
+        <a href="https://github.com/langner030/happyface/releases/latest" class="btn btn-primary" style="padding: 8px 20px; font-size: 13px;">Download</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ═══ HERO ═══ -->
+  <section class="hero">
+    <div class="container">
+      <div class="emoji-ring">
+        <span class="center-emoji">😊</span>
+        <span class="orbit-emoji">😐</span>
+        <span class="orbit-emoji">😢</span>
+        <span class="orbit-emoji">😠</span>
+        <span class="orbit-emoji">😲</span>
+        <span class="orbit-emoji">😨</span>
+        <span class="orbit-emoji">🙂</span>
+      </div>
+      <span class="badge">Für macOS · 100% Lokal</span>
+      <h1>Lächeln ist gut<br>für deine <span class="text-emerald">Gesundheit.</span></h1>
+      <p class="lead">
+        HappyFace analysiert deine Mimik in Echtzeit und hilft dir,
+        auch im HomeOffice bewusst positiv zu bleiben — mit
+        langfristig messbarem Effekt.
+      </p>
+      <div class="hero-buttons">
+        <a href="https://github.com/langner030/happyface/releases/latest" class="btn btn-primary">⬇ Kostenlos laden</a>
+        <a href="#wissenschaft" class="btn btn-ghost">Warum es wirkt →</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ PROBLEM ═══ -->
+  <section class="section section-alt">
+    <div class="container">
+      <div class="text-center fade-in">
+        <span class="badge">Das Problem</span>
+        <h2>Im HomeOffice fehlt das Feedback.</h2>
+        <p class="lead" style="margin: 0 auto;">
+          Ohne Kolleg:innen um dich herum merkst du oft nicht,
+          wie sich deine Stimmung über den Tag verändert.
+        </p>
+      </div>
+      <div class="problem-grid">
+        <div class="problem-card fade-in">
+          <span class="icon">🏠</span>
+          <h3>Isolation</h3>
+          <p>Im HomeOffice fehlt der soziale Spiegel. Niemand sagt dir, dass du seit Stunden die Stirn runzelst.</p>
+        </div>
+        <div class="problem-card fade-in">
+          <span class="icon">😶</span>
+          <h3>Unbewusste Mimik</h3>
+          <p>Studien zeigen: Wir nehmen unsere eigene Mimik kaum wahr. Negative Gesichtsausdrücke verstärken negative Emotionen — ein Teufelskreis.</p>
+        </div>
+        <div class="problem-card fade-in">
+          <span class="icon">📉</span>
+          <h3>Schleichender Effekt</h3>
+          <p>Chronisch angespannte Mimik erhöht Cortisol, schwächt das Immunsystem und senkt die Produktivität — ohne dass du es merkst.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ SCIENCE ═══ -->
+  <section class="section" id="wissenschaft">
+    <div class="container">
+      <div class="text-center fade-in">
+        <span class="badge">Wissenschaftlich belegt</span>
+        <h2>Was die Forschung sagt.</h2>
+        <p class="lead" style="margin: 0 auto;">
+          Die Verbindung zwischen Gesichtsausdruck, Emotionen und Gesundheit ist eine der am besten erforschten in der Psychologie.
+        </p>
+      </div>
+      <div class="science-grid">
+        <div class="science-card fade-in">
+          <div class="science-stat text-emerald">✓</div>
+          <h3>Facial Feedback Hypothese bestätigt</h3>
+          <p>
+            Eine Mega-Studie mit 3.878 Teilnehmenden aus 19 Ländern bestätigt:
+            Lächeln beeinflusst direkt, wie wir Emotionen erleben.
+            Dein Gesichtsausdruck formt deine Stimmung — nicht umgekehrt.
+          </p>
+          <a href="https://www.nature.com/articles/s41562-022-01458-9" target="_blank" rel="noopener" class="science-source">
+            Nature Human Behaviour, 2022
+          </a>
+        </div>
+        <div class="science-card fade-in">
+          <div class="science-stat" style="color: var(--amber);">+13%</div>
+          <h3>Produktiver durch Zufriedenheit</h3>
+          <p>
+            Forscher der University of Oxford zeigen:
+            Glückliche Mitarbeitende sind 13% produktiver.
+            Motivation, Kreativität und Problemlösungsfähigkeit steigen messbar.
+          </p>
+          <a href="https://www.ox.ac.uk/news/2019-10-24-happy-workers-are-13-more-productive" target="_blank" rel="noopener" class="science-source">
+            Oxford Sa&iuml;d Business School
+          </a>
+        </div>
+        <div class="science-card fade-in">
+          <div class="science-stat" style="color: var(--purple);">↓ Cortisol</div>
+          <h3>Weniger Stress, stärkeres Immunsystem</h3>
+          <p>
+            Echtes Lächeln (Duchenne Smile) senkt den Cortisolspiegel und fördert die Produktion von Immunzellen.
+            Der Effekt ist messbar in Herzrate und autonomer Reaktivität.
+          </p>
+          <a href="https://pubmed.ncbi.nlm.nih.gov/12899366/" target="_blank" rel="noopener" class="science-source">
+            PubMed · Soussignan, 2002
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ SOLUTION ═══ -->
+  <section class="section section-alt">
+    <div class="container" style="display: flex; align-items: center; gap: 60px; flex-wrap: wrap; justify-content: center;">
+      <div style="flex: 1; min-width: 300px;" class="fade-in">
+        <span class="badge">Die Lösung</span>
+        <h2>Dein stiller Begleiter in der Menubar.</h2>
+        <p class="lead">
+          HappyFace sitzt unsichtbar in deiner macOS-Menubar und analysiert deine Mimik —
+          sanft, privat und ohne dich zu stören.
+          Ein farbiger Punkt zeigt dir live, wie es dir geht.
+        </p>
+        <ul style="margin-top: 24px; list-style: none; font-size: 14px; color: var(--text-dim);">
+          <li style="margin-bottom: 10px;">🟢 <strong style="color: var(--text);">Grün</strong> — Du strahlst. Weiter so.</li>
+          <li style="margin-bottom: 10px;">🟡 <strong style="color: var(--text);">Gelb</strong> — Neutral. Zeit für eine Mikropause?</li>
+          <li style="margin-bottom: 10px;">🔴 <strong style="color: var(--text);">Rot</strong> — Angespannt. Atme bewusst durch.</li>
+        </ul>
+      </div>
+      <img src="app-screenshot.png" alt="HappyFace App — Echtzeit-Emotionserkennung mit 97% Happiness Score" class="app-screenshot fade-in">
+    </div>
+  </section>
+
+  <!-- ═══ FEATURES ═══ -->
+  <section class="section" id="features">
+    <div class="container">
+      <div class="text-center fade-in">
+        <span class="badge">Features</span>
+        <h2>Alles was du brauchst. Nichts, was du nicht brauchst.</h2>
+      </div>
+      <div class="features-grid">
+        <div class="feature-card fade-in">
+          <span class="feature-icon">⚡</span>
+          <h3>Live-Erkennung</h3>
+          <p>Echtzeit-Analyse deiner Mimik — bis zu 10× pro Sekunde. Reagiert sofort auf Veränderungen.</p>
+        </div>
+        <div class="feature-card fade-in">
+          <span class="feature-icon">📈</span>
+          <h3>Timeline</h3>
+          <p>Verfolge deinen Stimmungsverlauf über 60s, 60min, 24h oder die ganze Woche. Wie ein Activity Monitor für dein Wohlbefinden.</p>
+        </div>
+        <div class="feature-card fade-in">
+          <span class="feature-icon">🎯</span>
+          <h3>Smart Tray-Icon</h3>
+          <p>Das Menubar-Icon wechselt live die Farbe je nach dominanter Emotion. Ein Blick genügt.</p>
+        </div>
+        <div class="feature-card fade-in">
+          <span class="feature-icon">🔒</span>
+          <h3>100% Lokal</h3>
+          <p>Keine Cloud, keine Server, keine Daten die dein Gerät verlassen. Deine Mimik gehört dir allein.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ CTA ═══ -->
+  <section class="cta-section section-alt" id="download">
+    <div class="container fade-in">
+      <span class="badge">Jetzt starten</span>
+      <h2>Mach dein Lächeln messbar.</h2>
+      <p class="lead" style="margin: 0 auto 32px;">
+        Kostenlos. Für macOS. Keine Registrierung.
+      </p>
+      <div class="hero-buttons">
+        <a href="https://github.com/langner030/happyface/releases/latest" class="btn btn-primary">⬇ Download für macOS (Apple Silicon)</a>
+      </div>
+      <p style="margin-top: 20px; font-size: 12px; color: var(--text-muted);">
+        v0.1.0 · ~8 MB · macOS 13+ · Apple Silicon (M1/M2/M3/M4)
+      </p>
+    </div>
+  </section>
+
+  <!-- ═══ FOOTER ═══ -->
+  <footer>
+    <div class="container">
+      <p>☺ HappyFace · Made with care in Germany 🇩🇪</p>
+      <p style="margin-top: 6px;">
+        <a href="#wissenschaft">Wissenschaft</a> · <a href="#features">Features</a> · <a href="https://github.com/langner030/happyface" target="_blank" rel="noopener">GitHub</a>
+      </p>
+    </div>
+  </footer>
+
+  <!-- ═══ SCROLL ANIMATION ═══ -->
+  <script>
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+          }
+        });
+      },
+      { threshold: 0.15, rootMargin: '0px 0px -40px 0px' }
+    );
+    document.querySelectorAll('.fade-in').forEach((el) => observer.observe(el));
+  </script>
+
+</body>
+</html>

@@ -5,81 +5,81 @@
 <h1 align="center">☺ HappyFace</h1>
 
 <p align="center">
-  <strong>Lächeln ist gut für deine Gesundheit.</strong><br>
-  Echtzeit-Emotionserkennung als macOS Menubar-App — lokal, privat, wissenschaftlich fundiert.
+  <strong>Smiling is good for your health.</strong><br>
+  Real-time emotion recognition as a macOS menubar app — local, private, science-backed.
 </p>
 
 <p align="center">
   <a href="#features">Features</a> •
-  <a href="#wissenschaft">Wissenschaft</a> •
+  <a href="#science">Science</a> •
   <a href="#installation">Installation</a> •
   <a href="#download">Download</a>
 </p>
 
 ---
 
-## Das Problem
+## The Problem
 
-Im HomeOffice fehlt der soziale Spiegel. Niemand sagt dir, dass du seit Stunden die Stirn runzelst. Studien zeigen: Unbewusst negative Mimik verstärkt negative Emotionen — ein Teufelskreis, der Cortisol erhöht und die Produktivität senkt.
+Working from home, you lose the social mirror. No one tells you that you've been frowning for hours. Research shows that unconscious negative facial expressions reinforce negative emotions — a vicious cycle that raises cortisol and lowers productivity.
 
-## Die Lösung
+## The Solution
 
-**HappyFace** sitzt unsichtbar in deiner macOS-Menubar und analysiert deine Mimik in Echtzeit — sanft, privat und ohne dich zu stören. Ein farbiger Punkt zeigt dir live, wie es dir geht:
+**HappyFace** lives invisibly in your macOS menubar and analyzes your facial expressions in real time — gently, privately, and without interrupting your flow. A colored dot shows you how you're doing at a glance:
 
-- 🟢 **Grün** — Du strahlst. Weiter so.
-- 🟡 **Gelb** — Neutral. Zeit für eine Mikropause?
-- 🔴 **Rot** — Angespannt. Atme bewusst durch.
+- 🟢 **Green** — You're beaming. Keep it up.
+- 🟡 **Yellow** — Neutral. Time for a micro-break?
+- 🔴 **Red** — Tense. Take a conscious breath.
 
 ## Features
 
-| | Feature | Beschreibung |
+| | Feature | Description |
 |---|---|---|
-| ⚡ | **Live-Erkennung** | Echtzeit-Analyse deiner Mimik — bis zu 10× pro Sekunde |
-| 📈 | **Timeline** | Stimmungsverlauf über 60s, 60min, 24h oder 7 Tage |
-| 🎯 | **Smart Tray-Icon** | Menubar-Icon wechselt live die Farbe je nach Emotion |
-| 😊 | **Multi-Emotion** | Trackt 7 Emotionen: Happy, Sad, Angry, Surprised, Fearful, Disgusted, Neutral |
-| 🔥 | **Streak-Tracker** | Tage in Folge mit positivem Durchschnitt |
-| 💡 | **Smart Nudges** | Motivations-Tipps bei negativer Stimmung |
-| 📊 | **Statistiken** | Tages-Durchschnitt, Peak, 7-Tage-Übersicht |
-| 🔒 | **100% Lokal** | Keine Cloud, keine Server, keine Daten die dein Gerät verlassen |
+| ⚡ | **Live Detection** | Real-time facial analysis — up to 10× per second |
+| 📈 | **Timeline** | Track your mood over 60s, 60min, 24h, or 7 days |
+| 🎯 | **Smart Tray Icon** | Menubar icon changes color live based on dominant emotion |
+| 😊 | **Multi-Emotion** | Tracks 7 emotions: Happy, Sad, Angry, Surprised, Fearful, Disgusted, Neutral |
+| 🔥 | **Streak Tracker** | Consecutive days with a positive average |
+| 💡 | **Smart Nudges** | Motivational tips when your mood dips |
+| 📊 | **Statistics** | Daily average, peak, 7-day overview |
+| 🔒 | **100% Local** | No cloud, no servers, no data leaves your device |
 
-## Wissenschaft
+## Science
 
-Die Verbindung zwischen Gesichtsausdruck, Emotionen und Gesundheit ist wissenschaftlich gut belegt:
+The connection between facial expressions, emotions, and health is well-established:
 
-- **Facial Feedback Hypothese** — Lächeln beeinflusst direkt, wie wir Emotionen erleben. Bestätigt in einer Mega-Studie mit 3.878 Teilnehmenden ([Nature Human Behaviour, 2022](https://www.nature.com/articles/s41562-022-01458-9))
-- **+13% Produktivität** — Zufriedene Mitarbeitende arbeiten messbar produktiver ([Oxford Saïd Business School](https://www.ox.ac.uk/news/2019-10-24-happy-workers-are-13-more-productive))
-- **Weniger Cortisol** — Echtes Lächeln senkt den Cortisolspiegel und stärkt das Immunsystem ([PubMed, Soussignan 2002](https://pubmed.ncbi.nlm.nih.gov/12899366/))
+- **Facial Feedback Hypothesis** — Smiling directly influences how we experience emotions. Confirmed in a mega-study with 3,878 participants across 19 countries ([Nature Human Behaviour, 2022](https://www.nature.com/articles/s41562-022-01458-9))
+- **+13% Productivity** — Happy workers are measurably more productive ([Oxford Saïd Business School](https://www.ox.ac.uk/news/2019-10-24-happy-workers-are-13-more-productive))
+- **Lower Cortisol** — Genuine smiling (Duchenne smile) reduces cortisol levels and boosts immune function ([PubMed, Soussignan 2002](https://pubmed.ncbi.nlm.nih.gov/12899366/))
 
 ## Tech Stack
 
-| Technologie | Zweck |
+| Technology | Purpose |
 |---|---|
-| [Tauri 2](https://v2.tauri.app) | Leichtgewichtige Desktop-App (~15MB statt 200MB+ Electron) |
-| [face-api.js](https://github.com/nicedayfrankly/face-api.js) | Expression Detection mit Tiny-Modellen (~800KB) |
+| [Tauri 2](https://v2.tauri.app) | Lightweight desktop app (~15MB vs 200MB+ Electron) |
+| [face-api.js](https://github.com/vladmandic/face-api) | Expression detection with tiny models (~800KB) |
 | React 18 + TypeScript | Frontend |
-| Recharts | Timeline-Visualisierung |
-| Vite 6 | Build Tool |
-| Rust | Backend (Tray-Icon, Window Management) |
+| Recharts | Timeline visualization |
+| Vite 6 | Build tool |
+| Rust | Backend (tray icon, window management) |
 
 ## Installation
 
-### Voraussetzungen
+### Prerequisites
 
 - [Rust](https://rustup.rs/) (stable)
 - [Node.js](https://nodejs.org/) ≥ 18
-- macOS 13+ (Kamera-Berechtigung erforderlich)
+- macOS 13+ (camera permission required)
 
 ### Development
 
 ```bash
-# Dependencies installieren
+# Install dependencies
 npm install
 
-# face-api.js Modelle herunterladen
+# Download face-api.js models
 npm run download-models
 
-# Dev-Modus starten (Vite + Tauri)
+# Start dev mode (Vite + Tauri)
 npm run tauri dev
 ```
 
@@ -89,60 +89,60 @@ npm run tauri dev
 npm run tauri build
 ```
 
-Das erzeugt `HappyFace.app` und `HappyFace.dmg` in `src-tauri/target/release/bundle/`.
+This produces `HappyFace.app` and `HappyFace.dmg` in `src-tauri/target/release/bundle/`.
 
-### Kamera-Berechtigung
+### Camera Permission
 
-Beim ersten Start fragt macOS nach Kamera-Zugriff. Falls abgelehnt:
-**System Settings → Privacy & Security → Camera → HappyFace aktivieren**
+On first launch, macOS will ask for camera access. If denied:
+**System Settings → Privacy & Security → Camera → Enable HappyFace**
 
-## Architektur
+## Architecture
 
 ```
 happyface/
 ├── src/                        # React Frontend
 │   ├── components/
-│   │   ├── HappinessGauge.tsx  # SVG Ring-Gauge + Mini-Emotion-Circles
-│   │   ├── Timeline.tsx        # Multi-Range Recharts Timeline
-│   │   └── StatsPanel.tsx      # Streak, Stats, Week Bars
+│   │   ├── HappinessGauge.tsx  # SVG ring gauge + mini emotion circles
+│   │   ├── Timeline.tsx        # Multi-range Recharts timeline
+│   │   └── StatsPanel.tsx      # Streak, stats, week bars
 │   ├── hooks/
-│   │   ├── useFaceDetection.ts # Kamera + face-api.js (100ms Intervall)
-│   │   └── useCameraWatcher.ts # Video-Call Detection
+│   │   ├── useFaceDetection.ts # Camera + face-api.js (100ms interval)
+│   │   └── useCameraWatcher.ts # Video call detection
 │   ├── utils/
-│   │   ├── types.ts            # TypeScript Types
-│   │   └── storage.ts          # LocalStorage Persistence
-│   ├── App.tsx                 # Main App + Tray Icon Updates
-│   └── styles.css              # Dark Theme
+│   │   ├── types.ts            # TypeScript types
+│   │   └── storage.ts          # localStorage persistence
+│   ├── App.tsx                 # Main app + tray icon updates
+│   └── styles.css              # Dark theme
 ├── src-tauri/                  # Tauri Backend (Rust)
-│   ├── src/main.rs             # Dynamic Tray Icon + Window
-│   ├── tauri.conf.json         # App Config
-│   └── Entitlements.plist      # macOS Camera Entitlement
-├── landing/                    # Marketing Landing Page
+│   ├── src/main.rs             # Dynamic tray icon + window
+│   ├── tauri.conf.json         # App config
+│   └── Entitlements.plist      # macOS camera entitlement
+├── landing/                    # Marketing landing page
 │   └── index.html              # Standalone HTML
-└── public/models/              # face-api.js Modelle (~800KB)
+└── public/models/              # face-api.js models (~800KB)
 ```
 
-## Datenschutz
+## Privacy
 
-- **Alles lokal** — Keine Daten verlassen dein Gerät
-- **Kein Cloud** — Kein Account, kein Server, keine Registrierung
-- **Kamera-Frames** bleiben im Browser-Kontext, werden nie gespeichert
-- **Nur Scores** werden in LocalStorage persistiert
+- **Fully local** — No data ever leaves your device
+- **No cloud** — No accounts, no servers, no sign-up
+- **Camera frames** stay in the browser context, never saved to disk
+- **Only scores** are persisted in localStorage
 
-## Ressourcenverbrauch
+## Resource Usage
 
-| Metrik | Wert |
+| Metric | Value |
 |---|---|
 | RAM | ~80–120 MB |
-| CPU | ~2–5% bei 100ms Intervall |
-| App-Größe | ~15 MB |
-| Modelle | ~800 KB |
+| CPU | ~2–5% at 100ms interval |
+| App size | ~15 MB |
+| Models | ~800 KB |
 
 ## Download
 
-> **[→ Zum neuesten Release](https://github.com/langner030/happyface/releases/latest)**
+> **[→ Latest Release](https://github.com/langner030/happyface/releases/latest)**
 
-Lade die `.dmg`-Datei herunter, öffne sie und ziehe HappyFace in deinen Programme-Ordner.
+Download the `.dmg`, open it, and drag HappyFace into your Applications folder.
 
 ---
 

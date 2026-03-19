@@ -16,7 +16,7 @@
         "title": "HappyFace",
         "width": 380,
         "height": 520,
-        "resizable": false,
+        "resizable": true,
         "decorations": false,
         "transparent": true,
         "visible": false,

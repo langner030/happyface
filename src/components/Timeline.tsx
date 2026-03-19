@@ -1,12 +1,11 @@
 import { useEffect, useRef, useState, useMemo } from "react";
 import {
-  LineChart,
-  Line,
+  BarChart,
+  Bar,
   XAxis,
   YAxis,
   Tooltip,
   ResponsiveContainer,
-  ReferenceLine,
 } from "recharts";
 import { ExpressionSnapshot } from "../utils/types";
 import { loadDayData, getLast7Days } from "../utils/storage";
@@ -237,7 +236,7 @@ export function Timeline({ snapshots, currentExpression }: Props) {
       ) : (
         <>
           <ResponsiveContainer width="100%" height={195}>
-            <LineChart data={data} margin={{ top: 4, right: 4, left: -22, bottom: 0 }}>
+            <BarChart data={data} margin={{ top: 4, right: 4, left: -22, bottom: 0 }}>
               <XAxis
                 dataKey="label"
                 tick={{ fontSize: 9, fill: "#475569" }}
@@ -246,13 +245,10 @@ export function Timeline({ snapshots, currentExpression }: Props) {
                 interval={xInterval}
               />
               <YAxis
-                domain={[0, 100]}
                 tick={{ fontSize: 9, fill: "#475569" }}
                 axisLine={false}
                 tickLine={false}
-                ticks={[0, 25, 50, 75, 100]}
               />
-              <ReferenceLine y={50} stroke="#2a3040" strokeDasharray="4 4" />
               <Tooltip
                 isAnimationActive={false}
                 contentStyle={{
@@ -269,18 +265,17 @@ export function Timeline({ snapshots, currentExpression }: Props) {
                 }}
               />
               {EMOTIONS.map((e) => (
-                <Line
+                <Bar
                   key={e.key}
-                  type="monotone"
                   dataKey={e.key}
-                  stroke={e.color}
-                  strokeWidth={e.key === "happy" ? 2 : 1.5}
-                  dot={false}
+                  stackId="emotions"
+                  fill={e.color}
                   isAnimationActive={false}
                   hide={hidden.has(e.key)}
+                  radius={0}
                 />
               ))}
-            </LineChart>
+            </BarChart>
           </ResponsiveContainer>
 
           <div className="timeline-legend">

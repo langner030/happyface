@@ -35,7 +35,8 @@ body {
 
 .app {
   width: 380px;
-  height: 520px;
+  min-height: 200px;
+  max-height: 100vh;
   display: flex;
   flex-direction: column;
   background: var(--bg);
@@ -529,6 +530,50 @@ body {
 .timeline-container,
 .stats-panel {
   animation: fadeIn 0.25s ease;
+}
+
+/* ─── Collapsible Sections ─── */
+.collapsible-section {
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+
+.collapsible-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 6px 10px;
+  border: none;
+  background: var(--bg-card);
+  color: var(--text);
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  transition: background 0.15s ease;
+  flex-shrink: 0;
+  -webkit-app-region: no-drag;
+}
+
+.collapsible-header:hover {
+  background: var(--bg-hover);
+}
+
+.collapsible-title {
+  letter-spacing: 0.01em;
+}
+
+.collapsible-chevron {
+  font-size: 10px;
+  color: var(--text-muted);
+  transition: transform 0.2s ease;
+  display: inline-block;
+}
+
+.collapsible-chevron.collapsed {
+  transform: rotate(-90deg);
 }
 
 /* ─── Recharts Tooltip Override ─── */

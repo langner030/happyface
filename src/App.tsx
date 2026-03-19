@@ -38,6 +38,8 @@ export default function App() {
   const [streak, setStreak] = useState<StreakInfo>(loadStreak());
   const [weekData, setWeekData] = useState<DayData[]>([]);
   const [showSettings, setShowSettings] = useState(false);
+  const [previewCollapsed, setPreviewCollapsed] = useState(false);
+  const [chartsCollapsed, setChartsCollapsed] = useState(false);
 
   // Track previous shouldScan to detect transitions
   const prevShouldScan = useRef(shouldScan);
@@ -241,25 +243,46 @@ export default function App() {
         ))}
       </nav>
 
-      {/* ── Video ── always mounted so stream keeps running ── */}
-      <div className="video-wrapper" style={{ display: view === "live" ? undefined : "none" }}>
-        <video
-          ref={videoRef}
-          playsInline
-          muted
-          style={{ width: 320, height: 240, borderRadius: 12 }}
-        />
-        <canvas
-          ref={canvasRef}
-          style={{
-            position: "absolute",
-            top: 0,
-            left: 0,
-            width: 320,
-            height: 240,
-          }}
-        />
-      </div>
+      {/* ── Video Preview (collapsible) ── */}
+      {view === "live" && (
+        <div className="collapsible-section">
+          <button
+            className="collapsible-header"
+            onClick={() => setPreviewCollapsed(!previewCollapsed)}
+          >
+            <span className="collapsible-title">Preview</span>
+            <span className={`collapsible-chevron ${previewCollapsed ? "collapsed" : ""}`}>&#9662;</span>
+          </button>
+          {!previewCollapsed && (
+            <div className="video-wrapper">
+              <video
+                ref={videoRef}
+                playsInline
+                muted
+                style={{ width: 320, height: 240, borderRadius: 12 }}
+              />
+              <canvas
+                ref={canvasRef}
+                style={{
+                  position: "absolute",
+                  top: 0,
+                  left: 0,
+                  width: 320,
+                  height: 240,
+                }}
+              />
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* ── Hidden video element when preview collapsed but camera running ── */}
+      {(view !== "live" || previewCollapsed) && (
+        <div style={{ display: "none" }}>
+          <video ref={videoRef} playsInline muted />
+          <canvas ref={canvasRef} />
+        </div>
+      )}
 
       {/* ── Gauge ── */}
       {view === "live" && (
@@ -287,7 +310,18 @@ export default function App() {
         )}
 
         {view === "timeline" && (
-          <Timeline snapshots={todayData?.snapshots ?? []} currentExpression={currentExpression} />
+          <div className="collapsible-section">
+            <button
+              className="collapsible-header"
+              onClick={() => setChartsCollapsed(!chartsCollapsed)}
+            >
+              <span className="collapsible-title">Emotionen</span>
+              <span className={`collapsible-chevron ${chartsCollapsed ? "collapsed" : ""}`}>&#9662;</span>
+            </button>
+            {!chartsCollapsed && (
+              <Timeline snapshots={todayData?.snapshots ?? []} currentExpression={currentExpression} />
+            )}
+          </div>
         )}
 
         {view === "stats" && (

@@ -12,6 +12,9 @@ use tauri::{
     Emitter, Manager,
 };
 
+/// Track whether the window has been positioned initially.
+static INITIAL_POSITIONED: AtomicBool = AtomicBool::new(false);
+
 /// Known video call apps and their process names
 const VIDEO_CALL_APPS: &[(&str, &str)] = &[
     ("zoom.us", "Zoom"),
@@ -197,14 +200,18 @@ fn main() {
                                 let _ = window.show();
                                 let _ = window.set_focus();
 
-                                if let Ok(Some(monitor)) = window.primary_monitor() {
-                                    let size = monitor.size();
-                                    let scale = monitor.scale_factor();
-                                    let w = 380.0_f64;
-                                    let x = (size.width as f64 / scale) - w - 12.0;
-                                    let _ = window.set_position(tauri::Position::Logical(
-                                        tauri::LogicalPosition::new(x, 32.0),
-                                    ));
+                                // Only position on first show; after that let user drag freely
+                                if !INITIAL_POSITIONED.load(Ordering::Relaxed) {
+                                    INITIAL_POSITIONED.store(true, Ordering::Relaxed);
+                                    if let Ok(Some(monitor)) = window.primary_monitor() {
+                                        let size = monitor.size();
+                                        let scale = monitor.scale_factor();
+                                        let w = 380.0_f64;
+                                        let x = (size.width as f64 / scale) - w - 12.0;
+                                        let _ = window.set_position(tauri::Position::Logical(
+                                            tauri::LogicalPosition::new(x, 32.0),
+                                        ));
+                                    }
                                 }
                             }
                         }

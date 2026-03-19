@@ -25,6 +25,25 @@ export interface StreakInfo {
 
 export type AppView = "live" | "timeline" | "stats";
 
+export interface PremiumState {
+  isPremium: boolean;
+  /** Cumulative active usage in milliseconds */
+  totalUsageMs: number;
+  /** ISO date of first launch */
+  firstLaunchDate: string;
+  /** Whether the user has dismissed the hours-based prompt */
+  hoursDismissed: boolean;
+  /** Whether the user has dismissed the week-based prompt */
+  weekDismissed: boolean;
+}
+
+/** Free tier: max 5 days stored, prompt after 3h usage, hard prompt after 7d */
+export const FREE_LIMITS = {
+  maxDaysStored: 5,
+  usagePromptMs: 3 * 60 * 60 * 1000,  // 3 hours
+  weekPromptDays: 7,
+} as const;
+
 export const NUDGES: Record<string, string[]> = {
   low: [
     "Versuch mal bewusst zu lächeln — dein Gehirn folgt deinem Gesicht! 😊",

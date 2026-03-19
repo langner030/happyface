@@ -1,9 +1,11 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useFaceDetection } from "./hooks/useFaceDetection";
 import { useCameraWatcher } from "./hooks/useCameraWatcher";
+import { usePremium } from "./hooks/usePremium";
 import { HappinessGauge } from "./components/HappinessGauge";
 import { Timeline } from "./components/Timeline";
 import { StatsPanel } from "./components/StatsPanel";
+import { UpgradePrompt } from "./components/UpgradePrompt";
 import {
   loadDayData,
   saveDayData,
@@ -11,6 +13,7 @@ import {
   loadStreak,
   updateStreak,
   getLast7Days,
+  enforceStorageLimit,
 } from "./utils/storage";
 import {
   ExpressionSnapshot,
@@ -32,6 +35,13 @@ export default function App() {
   } = useFaceDetection();
 
   const { cameraStatus, mode, changeMode, shouldScan } = useCameraWatcher();
+  const {
+    isPremium,
+    showUpgrade,
+    dismissPrompt,
+    purchasePremium,
+    restorePurchase,
+  } = usePremium(isRunning);
 
   const [view, setView] = useState<AppView>("live");
   const [todayData, setTodayData] = useState<DayData | null>(null);
@@ -90,19 +100,20 @@ export default function App() {
 
     saveDayData(existing);
     setTodayData(existing);
+    enforceStorageLimit(isPremium);
 
     if (existing.totalScans % 60 === 0) {
       setStreak(updateStreak(existing.avgHappiness));
     }
-  }, [currentExpression]);
+  }, [currentExpression, isPremium]);
 
   // Load week data when switching to stats
   useEffect(() => {
     if (view === "stats") {
-      setWeekData(getLast7Days());
+      setWeekData(getLast7Days(isPremium));
       setStreak(loadStreak());
     }
-  }, [view]);
+  }, [view, isPremium]);
 
   // Update tray icon when dominant emotion changes
   const prevDominantEmotion = useRef<string | null>(null);
@@ -325,13 +336,30 @@ export default function App() {
         )}
 
         {view === "stats" && (
-          <StatsPanel
-            streak={streak}
-            todayData={todayData}
-            weekData={weekData}
-          />
+          <>
+            {!isPremium && (
+              <div className="free-limit-hint">
+                Free — max. 5 Tage gespeichert
+              </div>
+            )}
+            <StatsPanel
+              streak={streak}
+              todayData={todayData}
+              weekData={weekData}
+            />
+          </>
         )}
       </div>
+
+      {/* ── Upgrade Prompt Overlay ── */}
+      {showUpgrade && (
+        <UpgradePrompt
+          prompt={showUpgrade}
+          onPurchase={purchasePremium}
+          onRestore={restorePurchase}
+          onDismiss={dismissPrompt}
+        />
+      )}
     </div>
   );
 }

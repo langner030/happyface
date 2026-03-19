@@ -175,6 +175,8 @@ fn get_video_call_apps() -> Vec<String> {
 fn main() {
     tauri::Builder::default()
         .plugin(tauri_plugin_shell::init())
+        .plugin(tauri_plugin_store::Builder::default().build())
+        .plugin(tauri_plugin_iap::init())
         .invoke_handler(tauri::generate_handler![
             check_camera_status,
             get_video_call_apps,

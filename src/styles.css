@@ -576,6 +576,137 @@ body {
   transform: rotate(-90deg);
 }
 
+/* ─── Free Limit Hint ─── */
+.free-limit-hint {
+  text-align: center;
+  font-size: 10px;
+  color: var(--amber);
+  padding: 4px 10px;
+  margin-bottom: 6px;
+  background: rgba(251, 191, 36, 0.08);
+  border: 1px solid rgba(251, 191, 36, 0.15);
+  border-radius: var(--radius-sm);
+}
+
+/* ─── Upgrade Prompt Overlay ─── */
+.upgrade-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(15, 18, 25, 0.88);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  animation: fadeIn 0.2s ease;
+}
+
+.upgrade-card {
+  width: 320px;
+  padding: 24px 20px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  text-align: center;
+}
+
+.upgrade-icon {
+  font-size: 32px;
+  display: block;
+  margin-bottom: 10px;
+}
+
+.upgrade-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 8px;
+}
+
+.upgrade-message {
+  font-size: 12px;
+  color: var(--text-dim);
+  line-height: 1.5;
+  margin-bottom: 16px;
+}
+
+.upgrade-features {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 18px;
+  text-align: left;
+}
+
+.upgrade-feature {
+  font-size: 12px;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.upgrade-feature span {
+  color: var(--emerald);
+  font-weight: 700;
+  font-size: 13px;
+}
+
+.upgrade-buy-btn {
+  width: 100%;
+  padding: 10px 16px;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: var(--emerald);
+  color: #0f1219;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity 0.15s ease;
+}
+
+.upgrade-buy-btn:hover {
+  opacity: 0.9;
+}
+
+.upgrade-buy-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.upgrade-secondary {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 12px;
+}
+
+.upgrade-restore-btn,
+.upgrade-dismiss-btn {
+  background: none;
+  border: none;
+  font-family: inherit;
+  font-size: 11px;
+  cursor: pointer;
+  transition: color 0.15s ease;
+}
+
+.upgrade-restore-btn {
+  color: var(--text-muted);
+}
+
+.upgrade-restore-btn:hover {
+  color: var(--text);
+}
+
+.upgrade-dismiss-btn {
+  color: var(--text-muted);
+}
+
+.upgrade-dismiss-btn:hover {
+  color: var(--text-dim);
+}
+
 /* ─── Recharts Tooltip Override ─── */
 .recharts-tooltip-wrapper {
   outline: none !important;

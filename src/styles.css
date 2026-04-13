@@ -532,6 +532,26 @@ body {
   animation: fadeIn 0.25s ease;
 }
 
+/* ─── Overlay Toggle ─── */
+.overlay-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg);
+  cursor: pointer;
+  font-size: 12px;
+  color: var(--text);
+  user-select: none;
+}
+
+.overlay-toggle input[type="checkbox"] {
+  cursor: pointer;
+  accent-color: var(--emerald);
+}
+
 /* ─── Collapsible Sections ─── */
 .collapsible-section {
   border-radius: var(--radius-sm);

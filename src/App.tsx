@@ -52,6 +52,9 @@ export default function App() {
   const [showSettings, setShowSettings] = useState(false);
   const [previewCollapsed, setPreviewCollapsed] = useState(false);
   const [chartsCollapsed, setChartsCollapsed] = useState(false);
+  const [overlayEnabled, setOverlayEnabled] = useState<boolean>(
+    () => localStorage.getItem("happyface_overlay") === "1"
+  );
 
   // Track previous shouldScan to detect transitions
   const prevShouldScan = useRef(shouldScan);
@@ -141,6 +144,29 @@ export default function App() {
       .catch(() => {});
   }, [currentExpression, isRunning]);
 
+  // Push emotion updates into the screen-edge overlay window
+  useEffect(() => {
+    if (!overlayEnabled) return;
+    import("@tauri-apps/api/event")
+      .then(({ emitTo }) =>
+        emitTo("overlay", "emotion-update", {
+          happy: currentExpression?.happy ?? 0,
+          isRunning,
+        })
+      )
+      .catch(() => {});
+  }, [currentExpression, isRunning, overlayEnabled]);
+
+  // Show / hide the overlay window when toggle changes
+  useEffect(() => {
+    import("@tauri-apps/api/core")
+      .then(({ invoke }) =>
+        invoke("set_overlay_visible", { visible: overlayEnabled })
+      )
+      .catch(() => {});
+    localStorage.setItem("happyface_overlay", overlayEnabled ? "1" : "0");
+  }, [overlayEnabled]);
+
   const handleToggle = useCallback(() => {
     if (isRunning) {
       stopCamera();
@@ -225,6 +251,19 @@ export default function App() {
               <strong>{cameraStatus.active_apps.join(", ")}</strong>
             </div>
           )}
+
+          {/* Screen-edge overlay toggle */}
+          <p className="settings-title" style={{ marginTop: 12 }}>
+            Bildschirm-Indikator
+          </p>
+          <label className="overlay-toggle">
+            <input
+              type="checkbox"
+              checked={overlayEnabled}
+              onChange={(e) => setOverlayEnabled(e.target.checked)}
+            />
+            <span>Farbigen Rand am Bildschirm anzeigen</span>
+          </label>
         </div>
       )}
 

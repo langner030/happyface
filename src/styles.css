@@ -532,6 +532,106 @@ body {
   animation: fadeIn 0.25s ease;
 }
 
+/* ─── Subscription Box ─── */
+.subscription-box {
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.subscription-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.subscription-badge {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.subscription-badge.premium {
+  background: rgba(52, 211, 153, 0.15);
+  color: var(--emerald);
+  border: 1px solid rgba(52, 211, 153, 0.3);
+}
+
+.subscription-badge.free {
+  background: rgba(100, 116, 139, 0.12);
+  color: var(--text-dim);
+  border: 1px solid var(--border);
+}
+
+.subscription-label {
+  font-size: 11px;
+  color: var(--text-dim);
+}
+
+.subscription-price {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+  margin: 2px 0;
+}
+
+.subscription-buy-btn,
+.subscription-manage-btn,
+.subscription-restore-btn {
+  width: 100%;
+  padding: 8px 10px;
+  border-radius: var(--radius-sm);
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.subscription-buy-btn {
+  border: none;
+  background: var(--emerald);
+  color: #0f1219;
+}
+
+.subscription-buy-btn:hover {
+  opacity: 0.9;
+}
+
+.subscription-manage-btn {
+  border: 1px solid var(--emerald);
+  background: transparent;
+  color: var(--emerald);
+}
+
+.subscription-manage-btn:hover {
+  background: rgba(52, 211, 153, 0.08);
+}
+
+.subscription-restore-btn {
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text-dim);
+}
+
+.subscription-restore-btn:hover {
+  border-color: var(--text-muted);
+  color: var(--text);
+}
+
+.subscription-hint {
+  font-size: 10px;
+  line-height: 1.4;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
 /* ─── Overlay Toggle ─── */
 .overlay-toggle {
   display: flex;

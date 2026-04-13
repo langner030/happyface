@@ -264,6 +264,73 @@ export default function App() {
             />
             <span>Farbigen Rand am Bildschirm anzeigen</span>
           </label>
+
+          {/* Subscription section */}
+          <p className="settings-title" style={{ marginTop: 12 }}>
+            Abonnement
+          </p>
+          <div className="subscription-box">
+            <div className="subscription-status">
+              <span
+                className={`subscription-badge ${isPremium ? "premium" : "free"}`}
+              >
+                {isPremium ? "PREMIUM" : "FREE"}
+              </span>
+              <span className="subscription-label">
+                {isPremium
+                  ? "Alle Features freigeschaltet"
+                  : "Begrenzt auf 5 Tage Verlauf"}
+              </span>
+            </div>
+
+            {isPremium ? (
+              <>
+                <p className="subscription-price">5,99 € / Monat</p>
+                <button
+                  className="subscription-manage-btn"
+                  onClick={async () => {
+                    try {
+                      const { open } = await import(
+                        "@tauri-apps/plugin-shell"
+                      );
+                      await open(
+                        "https://apps.apple.com/account/subscriptions"
+                      );
+                    } catch {
+                      /* shell plugin unavailable */
+                    }
+                  }}
+                >
+                  Abo verwalten
+                </button>
+                <p className="subscription-hint">
+                  Kündigung jederzeit in den macOS System-Einstellungen.
+                </p>
+              </>
+            ) : (
+              <>
+                <p className="subscription-price">
+                  Premium: 5,99 € / Monat
+                </p>
+                <button
+                  className="subscription-buy-btn"
+                  onClick={purchasePremium}
+                >
+                  Jetzt abonnieren
+                </button>
+                <button
+                  className="subscription-restore-btn"
+                  onClick={restorePurchase}
+                >
+                  Abo wiederherstellen
+                </button>
+                <p className="subscription-hint">
+                  Das Abo verlängert sich automatisch monatlich. Jederzeit
+                  kündbar.
+                </p>
+              </>
+            )}
+          </div>
         </div>
       )}
 

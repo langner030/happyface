@@ -44,7 +44,9 @@ export default function App() {
   } = usePremium(isRunning);
 
   const [view, setView] = useState<AppView>("live");
-  const [todayData, setTodayData] = useState<DayData | null>(null);
+  const [todayData, setTodayData] = useState<DayData | null>(() =>
+    loadDayData(getTodayKey())
+  );
   const [streak, setStreak] = useState<StreakInfo>(loadStreak());
   const [weekData, setWeekData] = useState<DayData[]>([]);
   const [showSettings, setShowSettings] = useState(false);

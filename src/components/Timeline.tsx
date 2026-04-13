@@ -196,7 +196,11 @@ export function Timeline({ snapshots, currentExpression }: Props) {
   }));
 
   const data = range === "60s" ? liveAsPoints : staticData;
-  const isEmpty = data.length < 2;
+  // Only empty if truly no data points, or if all values are zero across all points
+  const hasAnyValue = data.some((p) =>
+    EMOTIONS.some((e) => (p[e.key] as number) > 0)
+  );
+  const isEmpty = data.length === 0 || !hasAnyValue;
 
   const toggleEmotion = (key: string) => {
     setHidden((prev) => {
@@ -245,9 +249,11 @@ export function Timeline({ snapshots, currentExpression }: Props) {
                 interval={xInterval}
               />
               <YAxis
+                domain={[0, 100]}
                 tick={{ fontSize: 9, fill: "#475569" }}
                 axisLine={false}
                 tickLine={false}
+                ticks={[0, 25, 50, 75, 100]}
               />
               <Tooltip
                 isAnimationActive={false}

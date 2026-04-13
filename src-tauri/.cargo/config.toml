@@ -1,0 +1,7 @@
+# macOS: StoreKit 2 (via tauri-plugin-iap) requires Swift concurrency runtime.
+# The dylib lives in /usr/lib/swift but is not on the default rpath.
+[target.'cfg(target_os = "macos")']
+rustflags = [
+    "-C", "link-arg=-Wl,-rpath,/usr/lib/swift",
+    "-C", "link-arg=-Wl,-rpath,/usr/lib/swift-5.5/macosx",
+]

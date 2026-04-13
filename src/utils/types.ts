@@ -31,35 +31,93 @@ export interface PremiumState {
   totalUsageMs: number;
   /** ISO date of first launch */
   firstLaunchDate: string;
-  /** Whether the user has dismissed the hours-based prompt */
-  hoursDismissed: boolean;
-  /** Whether the user has dismissed the week-based prompt */
-  weekDismissed: boolean;
+  /** Whether the user has dismissed the 15-minute upgrade prompt */
+  usagePromptDismissed: boolean;
+  /** Whether the user has dismissed the 2-day upgrade prompt */
+  dayPromptDismissed: boolean;
 }
 
-/** Free tier: max 5 days stored, prompt after 3h usage, hard prompt after 7d */
+/** Free tier limits and upgrade funnel thresholds */
 export const FREE_LIMITS = {
   maxDaysStored: 5,
-  usagePromptMs: 3 * 60 * 60 * 1000,  // 3 hours
-  weekPromptDays: 7,
+  softUsagePromptMs: 15 * 60 * 1000,
+  softDayPromptDays: 2,
+  hardUsagePromptMs: 80 * 60 * 1000,
 } as const;
 
-export const NUDGES: Record<string, string[]> = {
-  low: [
-    "Versuch mal bewusst zu lächeln — dein Gehirn folgt deinem Gesicht! 😊",
-    "Kurze Pause? Steh auf, streck dich, atme tief durch.",
-    "Denk an etwas, das dich letzte Woche zum Lachen gebracht hat.",
-    "Ein Glas Wasser und 3 tiefe Atemzüge wirken Wunder.",
-    "Schreib jemandem eine nette Nachricht — Geben macht happy!",
-  ],
-  medium: [
-    "Du bist auf einem guten Weg — keep going! 💪",
-    "Dein Gesicht zeigt: du bist fokussiert. Gönn dir trotzdem eine Mini-Pause.",
-    "Tipp: Alle 25 Minuten kurz vom Bildschirm wegsehen.",
-  ],
-  high: [
-    "Du strahlst! Das überträgt sich auf deine Arbeit. ✨",
-    "Deine positive Energie heute ist ansteckend — weiter so!",
-    "Peak Happiness erreicht! So macht Arbeit Spaß.",
-  ],
-};
+// ── Gamification ──────────────────────────────────────────────
+export interface AchievementDef {
+  id: string;
+  title: string;
+  emoji: string;
+  category: "streak" | "scan" | "emotion" | "time" | "special";
+}
+
+export interface LevelThreshold {
+  level: number;
+  xpRequired: number;
+  title: string;
+  emoji: string;
+}
+
+export interface PersonalRecords {
+  longestHappyStreak: number;   // consecutive scans >50% happy
+  highestHappyScore: number;    // single scan peak
+  totalHappyMinutes: number;    // cumulative minutes >50% happy
+  longestSession: number;       // longest continuous session in minutes
+}
+
+export interface GamificationState {
+  achievements: Record<string, number | null>; // id → unlockedAt timestamp
+  xp: number;
+  level: number;
+  records: PersonalRecords;
+  counters: {
+    totalScans: number;
+    totalUsageMinutes: number;
+    happyScansAbove70: number;
+    surprisedScansAbove50: number;
+    neutralScansAbove50: number;
+    nightScans: number;
+    earlyScans: number;
+    peakHappinessEver: number;
+    consecutiveHappyScans: number;
+    maxConsecutiveHappyScans: number;
+  };
+}
+
+export interface ToastItem {
+  id: string;
+  emoji: string;
+  title: string;
+  subtitle: string;
+  type: "achievement" | "levelup" | "record" | "nudge";
+}
+
+export const NUDGES: { emoji: string; text: string; category: "low" | "medium" | "high" }[] = [
+  // Low happiness
+  { emoji: "😊", text: "Versuch mal bewusst zu lächeln!", category: "low" },
+  { emoji: "🧘", text: "Steh auf, streck dich, atme tief.", category: "low" },
+  { emoji: "💭", text: "Denk an was Schönes von letzter Woche.", category: "low" },
+  { emoji: "💧", text: "Ein Glas Wasser wirkt Wunder.", category: "low" },
+  { emoji: "💌", text: "Schreib jemandem was Nettes!", category: "low" },
+  { emoji: "🎵", text: "Hör deinen Lieblingssong.", category: "low" },
+  { emoji: "🌿", text: "Schau kurz aus dem Fenster.", category: "low" },
+  { emoji: "😤", text: "3x tief ein- und ausatmen.", category: "low" },
+
+  // Medium
+  { emoji: "💪", text: "Du bist auf einem guten Weg!", category: "medium" },
+  { emoji: "👀", text: "Kurz vom Bildschirm wegsehen.", category: "medium" },
+  { emoji: "☕", text: "Zeit für einen kleinen Kaffee?", category: "medium" },
+  { emoji: "🙌", text: "Gute Fokus-Energy gerade!", category: "medium" },
+  { emoji: "🎯", text: "Bleib dran, du machst das gut.", category: "medium" },
+  { emoji: "⏰", text: "Nächste Pause in 10 Minuten?", category: "medium" },
+
+  // High happiness
+  { emoji: "✨", text: "Du strahlst! Weiter so!", category: "high" },
+  { emoji: "🔥", text: "Positive Energie ist ansteckend!", category: "high" },
+  { emoji: "🚀", text: "Peak Performance! So macht's Spaß.", category: "high" },
+  { emoji: "⭐", text: "Dein Lächeln rockt gerade.", category: "high" },
+  { emoji: "🎉", text: "Happy Vibes! Keep going!", category: "high" },
+  { emoji: "💎", text: "Beste Laune — das sieht man!", category: "high" },
+];

@@ -4,8 +4,8 @@
   "windows": ["main"],
   "permissions": [
     "core:default",
+    "iap:default",
     "shell:allow-open",
-    "store:default",
-    "iap:default"
+    "store:default"
   ]
 }

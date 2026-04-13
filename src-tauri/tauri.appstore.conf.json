@@ -1,0 +1,17 @@
+{
+  "build": {
+    "beforeBuildCommand": "VITE_APP_STORE=1 npm run build"
+  },
+  "app": {
+    "macOSPrivateApi": false
+  },
+  "bundle": {
+    "targets": ["app"],
+    "macOS": {
+      "entitlements": "Entitlements.mas.plist",
+      "hardenedRuntime": true,
+      "minimumSystemVersion": "13.0",
+      "infoPlist": "Info.plist"
+    }
+  }
+}

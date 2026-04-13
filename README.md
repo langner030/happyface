@@ -91,6 +91,29 @@ npm run tauri build
 
 This produces `HappyFace.app` and `HappyFace.dmg` in `src-tauri/target/release/bundle/`.
 
+### Mac App Store Build
+
+```bash
+npm run build:appstore
+```
+
+This produces a sandboxed `HappyFace.app` for App Store distribution in `src-tauri/target/release/bundle/macos/`.
+
+App Store-specific adjustments in this build:
+
+- App Sandbox is enabled via `src-tauri/Entitlements.mas.plist`
+- macOS private APIs are disabled
+- process scanning for camera auto-detection is disabled
+- Premium is wired to StoreKit via `tauri-plugin-iap`
+
+For the final App Store upload you still need:
+
+- an Apple Developer account with `3rd Party Mac Developer Application` signing
+- a unique bundle identifier for your Apple Developer account instead of `com.happyface.desktop`
+- an App Store Connect in-app product matching `com.happyface.premium`
+- a bumped version/build number for each submission
+- archiving/signing with your production certificates and upload via Xcode Organizer or Transporter
+
 ### Camera Permission
 
 On first launch, macOS will ask for camera access. If denied:

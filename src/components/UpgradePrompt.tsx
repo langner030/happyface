@@ -1,37 +1,62 @@
 import { useState } from "react";
-import { UpgradePrompt as PromptType } from "../hooks/usePremium";
+import { type Product } from "@choochmeque/tauri-plugin-iap-api";
+import { PremiumStatusMessage, UpgradePromptKind as PromptType } from "../hooks/usePremium";
+import { t } from "../i18n";
 
 interface Props {
   prompt: PromptType;
   onPurchase: () => Promise<boolean>;
   onRestore: () => Promise<boolean>;
   onDismiss: (prompt: PromptType) => void;
+  canDismiss: boolean;
+  loading?: boolean;
+  product?: Product | null;
+  statusMessage?: PremiumStatusMessage | null;
+  storeReady?: boolean;
 }
 
-export function UpgradePrompt({ prompt, onPurchase, onRestore, onDismiss }: Props) {
-  const [loading, setLoading] = useState(false);
+export function UpgradePrompt({
+  prompt,
+  onPurchase,
+  onRestore,
+  onDismiss,
+  canDismiss,
+  loading = false,
+  product,
+  statusMessage,
+  storeReady = false,
+}: Props) {
+  const [pendingAction, setPendingAction] = useState<"purchase" | "restore" | null>(null);
 
   const handlePurchase = async () => {
-    setLoading(true);
+    setPendingAction("purchase");
     await onPurchase();
-    setLoading(false);
+    setPendingAction(null);
   };
 
   const handleRestore = async () => {
-    setLoading(true);
+    setPendingAction("restore");
     await onRestore();
-    setLoading(false);
+    setPendingAction(null);
   };
 
   const title =
-    prompt === "hours"
-      ? "Du nutzt HappyFace gerne?"
-      : "Wochenvergleich freischalten?";
+    prompt === "usage_soft"
+      ? t("upgrade_soft_usage_title")
+      : prompt === "days_soft"
+        ? t("upgrade_soft_day_title")
+        : t("upgrade_hard_usage_title");
 
   const message =
-    prompt === "hours"
-      ? "Du hast bereits mehrere Stunden aktiv getrackt. Mit Premium speicherst du unbegrenzt Tage und kannst deine Woche vergleichen."
-      : "Du nutzt HappyFace jetzt seit einer Woche! Möchtest du deine Daten behalten und Wochen vergleichen? In der Free-Version werden nur 5 Tage gespeichert.";
+    prompt === "usage_soft"
+      ? t("upgrade_soft_usage_message")
+      : prompt === "days_soft"
+        ? t("upgrade_soft_day_message")
+        : t("upgrade_hard_usage_message");
+
+  const ctaLabel = product?.formattedPrice
+    ? `${t("unlock_premium")} ${t("for_price", { price: product.formattedPrice })}`
+    : t("unlock_premium");
 
   return (
     <div className="upgrade-overlay">
@@ -39,16 +64,19 @@ export function UpgradePrompt({ prompt, onPurchase, onRestore, onDismiss }: Prop
         <span className="upgrade-icon">⭐</span>
         <h3 className="upgrade-title">{title}</h3>
         <p className="upgrade-message">{message}</p>
+        {prompt === "usage_hard" && (
+          <p className="upgrade-required-note">{t("upgrade_required_note")}</p>
+        )}
 
         <div className="upgrade-features">
           <div className="upgrade-feature">
-            <span>✓</span> Unbegrenzter Datenverlauf
+            <span>✓</span> {t("upgrade_feature_history")}
           </div>
           <div className="upgrade-feature">
-            <span>✓</span> Wochenvergleich &amp; Trends
+            <span>✓</span> {t("upgrade_feature_weekly")}
           </div>
           <div className="upgrade-feature">
-            <span>✓</span> Vollständige 7-Tage Statistiken
+            <span>✓</span> {t("upgrade_feature_stats")}
           </div>
         </div>
 
@@ -57,7 +85,7 @@ export function UpgradePrompt({ prompt, onPurchase, onRestore, onDismiss }: Prop
           onClick={handlePurchase}
           disabled={loading}
         >
-          {loading ? "…" : "Premium freischalten"}
+          {loading && pendingAction === "purchase" ? "…" : ctaLabel}
         </button>
 
         <div className="upgrade-secondary">
@@ -66,15 +94,20 @@ export function UpgradePrompt({ prompt, onPurchase, onRestore, onDismiss }: Prop
             onClick={handleRestore}
             disabled={loading}
           >
-            Kauf wiederherstellen
+            {loading && pendingAction === "restore" ? "…" : t("restore_purchase")}
           </button>
-          <button
-            className="upgrade-dismiss-btn"
-            onClick={() => onDismiss(prompt)}
-          >
-            Später
-          </button>
+          {canDismiss && (
+            <button
+              className="upgrade-dismiss-btn"
+              onClick={() => onDismiss(prompt)}
+              disabled={loading}
+            >
+              {t("later")}
+            </button>
+          )}
         </div>
+        {!storeReady && <p className="upgrade-status">{t("store_unavailable")}</p>}
+        {statusMessage && <p className="upgrade-status">{t(statusMessage)}</p>}
       </div>
     </div>
   );

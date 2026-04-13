@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { NUDGES, ExpressionSnapshot } from "../utils/types";
+import { ExpressionSnapshot } from "../utils/types";
 
 interface Props {
   score: number;
@@ -22,6 +22,7 @@ function MiniCircle({ value, emoji, label, color }: MiniCircleProps) {
   return (
     <div className="mini-circle" title={`${label}: ${value}%`}>
       <svg width="56" height="56" viewBox="0 0 56 56">
+        <circle cx="28" cy="28" r="26" fill="rgba(15,18,25,0.45)" />
         <circle
           cx="28" cy="28" r={r}
           fill="none"
@@ -66,13 +67,6 @@ export function HappinessGauge({ score, isRunning, expressions }: Props) {
     return "😔";
   }, [clampedScore, isRunning]);
 
-  const nudge = useMemo(() => {
-    const category =
-      clampedScore > 60 ? "high" : clampedScore > 30 ? "medium" : "low";
-    const list = NUDGES[category];
-    return list[Math.floor(Math.random() * list.length)];
-  }, [Math.floor(clampedScore / 20)]);
-
   const circumference = 2 * Math.PI * 54;
   const offset = circumference - (clampedScore / 100) * circumference;
 
@@ -91,6 +85,7 @@ export function HappinessGauge({ score, isRunning, expressions }: Props) {
         {/* ── Main circle ── */}
         <div className="gauge-ring">
           <svg width="140" height="140" viewBox="0 0 140 140">
+            <circle cx="70" cy="70" r="64" fill="rgba(15,18,25,0.45)" />
             <circle cx="70" cy="70" r="54" fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth="8" />
             <circle
               cx="70" cy="70" r="54"
@@ -122,7 +117,6 @@ export function HappinessGauge({ score, isRunning, expressions }: Props) {
         )}
       </div>
 
-      {isRunning && <p className="nudge-text">{nudge}</p>}
     </div>
   );
 }

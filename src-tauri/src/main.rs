@@ -2,7 +2,6 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 use serde::Serialize;
-use std::process::Command;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Arc;
 use std::time::Duration;
@@ -16,6 +15,7 @@ use tauri::{
 static INITIAL_POSITIONED: AtomicBool = AtomicBool::new(false);
 
 /// Known video call apps and their process names
+#[cfg(not(feature = "app-store"))]
 const VIDEO_CALL_APPS: &[(&str, &str)] = &[
     ("zoom.us", "Zoom"),
     ("Microsoft Teams", "Teams"),
@@ -105,7 +105,10 @@ fn update_tray_icon(emotion: String, app: tauri::AppHandle) {
     }
 }
 
-#[cfg(target_os = "macos")]
+#[cfg(all(target_os = "macos", not(feature = "app-store")))]
+use std::process::Command;
+
+#[cfg(all(target_os = "macos", not(feature = "app-store")))]
 fn detect_camera_usage() -> (bool, Vec<String>) {
     let mut active_apps: Vec<String> = Vec::new();
 
@@ -142,7 +145,7 @@ fn detect_camera_usage() -> (bool, Vec<String>) {
     (true, active_apps)
 }
 
-#[cfg(not(target_os = "macos"))]
+#[cfg(any(not(target_os = "macos"), feature = "app-store"))]
 fn detect_camera_usage() -> (bool, Vec<String>) {
     (false, vec![])
 }
@@ -159,6 +162,13 @@ fn check_camera_status() -> CameraStatus {
 
 #[tauri::command]
 fn get_video_call_apps() -> Vec<String> {
+    #[cfg(feature = "app-store")]
+    {
+        Vec::new()
+    }
+
+    #[cfg(not(feature = "app-store"))]
+    {
     VIDEO_CALL_APPS
         .iter()
         .map(|(_, name)| name.to_string())
@@ -170,13 +180,14 @@ fn get_video_call_apps() -> Vec<String> {
             }
             acc
         })
+    }
 }
 
 fn main() {
     tauri::Builder::default()
+        .plugin(tauri_plugin_iap::init())
         .plugin(tauri_plugin_shell::init())
         .plugin(tauri_plugin_store::Builder::default().build())
-        .plugin(tauri_plugin_iap::init())
         .invoke_handler(tauri::generate_handler![
             check_camera_status,
             get_video_call_apps,

@@ -52,13 +52,23 @@ export function UpgradePrompt({ prompt, onPurchase, onRestore, onDismiss }: Prop
           </div>
         </div>
 
+        <div className="upgrade-price">
+          <span className="upgrade-price-amount">5,99 €</span>
+          <span className="upgrade-price-period">/ Monat</span>
+        </div>
+
         <button
           className="upgrade-buy-btn"
           onClick={handlePurchase}
           disabled={loading}
         >
-          {loading ? "…" : "Premium freischalten"}
+          {loading ? "…" : "Premium abonnieren"}
         </button>
+
+        <p className="upgrade-terms">
+          Abo verlängert sich automatisch monatlich für 5,99 €. Jederzeit in
+          den System-Einstellungen kündbar.
+        </p>
 
         <div className="upgrade-secondary">
           <button
@@ -66,7 +76,7 @@ export function UpgradePrompt({ prompt, onPurchase, onRestore, onDismiss }: Prop
             onClick={handleRestore}
             disabled={loading}
           >
-            Kauf wiederherstellen
+            Abo wiederherstellen
           </button>
           <button
             className="upgrade-dismiss-btn"

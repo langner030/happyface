@@ -671,6 +671,36 @@ body {
   font-size: 13px;
 }
 
+.upgrade-price {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 4px;
+  margin: 12px 0 10px;
+}
+
+.upgrade-price-amount {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: -0.02em;
+}
+
+.upgrade-price-period {
+  font-size: 13px;
+  color: var(--text-dim);
+  font-weight: 500;
+}
+
+.upgrade-terms {
+  margin: 8px 0 6px;
+  padding: 0 4px;
+  font-size: 10px;
+  line-height: 1.4;
+  color: var(--text-muted);
+  text-align: center;
+}
+
 .upgrade-buy-btn {
   width: 100%;
   padding: 10px 16px;

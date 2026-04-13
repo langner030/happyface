@@ -2,7 +2,8 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { PremiumState, FREE_LIMITS } from "../utils/types";
 
 const PREMIUM_KEY = "happyface_premium";
-const PRODUCT_ID = "com.happyface.premium";
+const PRODUCT_ID = "com.happyface.premium.monthly";
+const PRODUCT_TYPE = "subs" as const;
 
 function loadPremiumState(): PremiumState {
   try {
@@ -101,11 +102,11 @@ export function usePremium(isRunning: boolean) {
         "@choochmeque/tauri-plugin-iap-api"
       );
 
-      // Try to purchase
-      await purchase(PRODUCT_ID, "inapp");
+      // Start subscription flow
+      await purchase(PRODUCT_ID, PRODUCT_TYPE);
 
-      // Verify
-      const status = await getProductStatus(PRODUCT_ID, "inapp");
+      // Verify active subscription
+      const status = await getProductStatus(PRODUCT_ID, PRODUCT_TYPE);
       if (status?.isOwned) {
         setState((prev) => {
           const next = { ...prev, isPremium: true };
@@ -117,7 +118,7 @@ export function usePremium(isRunning: boolean) {
       }
       return false;
     } catch (err) {
-      console.error("Purchase failed:", err);
+      console.error("Subscription failed:", err);
       return false;
     }
   }, []);
@@ -128,8 +129,8 @@ export function usePremium(isRunning: boolean) {
         "@choochmeque/tauri-plugin-iap-api"
       );
 
-      await restorePurchases("inapp");
-      const status = await getProductStatus(PRODUCT_ID, "inapp");
+      await restorePurchases(PRODUCT_TYPE);
+      const status = await getProductStatus(PRODUCT_ID, PRODUCT_TYPE);
 
       if (status?.isOwned) {
         setState((prev) => {
@@ -147,24 +148,24 @@ export function usePremium(isRunning: boolean) {
     }
   }, []);
 
-  // Check purchase status on mount (for restoring across reinstalls)
+  // Check subscription status on mount — also detects expired subscriptions
+  // so a lapsed user loses Premium until they renew.
   useEffect(() => {
-    if (state.isPremium) return;
     (async () => {
       try {
         const { getProductStatus } = await import(
           "@choochmeque/tauri-plugin-iap-api"
         );
-        const status = await getProductStatus(PRODUCT_ID, "inapp");
-        if (status?.isOwned) {
-          setState((prev) => {
-            const next = { ...prev, isPremium: true };
-            savePremiumState(next);
-            return next;
-          });
-        }
+        const status = await getProductStatus(PRODUCT_ID, PRODUCT_TYPE);
+        const active = !!status?.isOwned;
+        setState((prev) => {
+          if (prev.isPremium === active) return prev;
+          const next = { ...prev, isPremium: active };
+          savePremiumState(next);
+          return next;
+        });
       } catch {
-        // IAP not available (dev mode / non-macOS)
+        // IAP not available (dev mode / non-macOS) — keep cached state
       }
     })();
   }, []);

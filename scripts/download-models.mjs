@@ -1,43 +1,39 @@
-import { mkdir } from "fs/promises";
-import { execSync } from "child_process";
+import { mkdir, readdir, copyFile } from "fs/promises";
+import { existsSync } from "fs";
+import { join } from "path";
 
-const MODEL_BASE =
-  "https://github.com/nicholasgasior/face-api.js/raw/master/weights";
+const SRC_DIR = join("node_modules", "@vladmandic", "face-api", "model");
+const DEST_DIR = join("public", "models");
 
-const MODELS = [
-  "tiny_face_detector_model-weights_manifest.json",
-  "tiny_face_detector_model-shard1",
-  "face_landmark_68_tiny_model-weights_manifest.json",
-  "face_landmark_68_tiny_model-shard1",
-  "face_expression_model-weights_manifest.json",
-  "face_expression_model-shard1",
+const PREFIXES = [
+  "tiny_face_detector",
+  "face_landmark_68_tiny",
+  "face_expression",
 ];
 
-const MODEL_DIR = "public/models";
-
-async function download() {
-  await mkdir(MODEL_DIR, { recursive: true });
-  console.log("Downloading face-api.js models...\n");
-
-  // Note: In practice, models ship with @vladmandic/face-api.
-  // Copy them from node_modules/@vladmandic/face-api/model/ instead:
-  console.log("Copying models from @vladmandic/face-api...");
-  try {
-    execSync(
-      `cp node_modules/@vladmandic/face-api/model/tiny_face_detector* ${MODEL_DIR}/`
-    );
-    execSync(
-      `cp node_modules/@vladmandic/face-api/model/face_landmark_68_tiny* ${MODEL_DIR}/`
-    );
-    execSync(
-      `cp node_modules/@vladmandic/face-api/model/face_expression* ${MODEL_DIR}/`
-    );
-    console.log("Done! Models copied to public/models/");
-  } catch {
+async function main() {
+  if (!existsSync(SRC_DIR)) {
     console.error(
-      "Could not copy from node_modules. Run 'npm install' first."
+      `Source ${SRC_DIR} not found. Run 'npm install' first.`
     );
+    process.exit(1);
   }
+
+  await mkdir(DEST_DIR, { recursive: true });
+  const files = await readdir(SRC_DIR);
+
+  let copied = 0;
+  for (const file of files) {
+    if (PREFIXES.some((p) => file.startsWith(p))) {
+      await copyFile(join(SRC_DIR, file), join(DEST_DIR, file));
+      copied += 1;
+    }
+  }
+
+  console.log(`Copied ${copied} model file(s) to ${DEST_DIR}`);
 }
 
-download();
+main().catch((err) => {
+  console.error(err);
+  process.exit(1);
+});

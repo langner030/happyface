@@ -4,6 +4,7 @@ import {
   Bar,
   XAxis,
   YAxis,
+  Tooltip,
   ResponsiveContainer,
 } from "recharts";
 import { ExpressionSnapshot } from "../utils/types";
@@ -138,7 +139,7 @@ interface LivePoint extends Omit<Point, "label"> { t: number }
 
 // ─── Component ───────────────────────────────────────────────────
 export function Timeline({ snapshots, currentExpression }: Props) {
-  const range: Range = "60s";
+  const [range, setRange] = useState<Range>("60s");
   const [hidden, setHidden] = useState<Set<string>>(new Set());
 
   // ── Live 60s state ──
@@ -179,13 +180,27 @@ export function Timeline({ snapshots, currentExpression }: Props) {
     ].slice(-60));
   }, [currentExpression]);
 
-  // ── Merge live into Point[] ──
-  const data: Point[] = live.map((p) => ({
+  // ── Static range data ──
+  const staticData = useMemo<Point[]>(() => {
+    if (range === "60m") return build60m(snapshots);
+    if (range === "24h") return build24h(snapshots);
+    if (range === "7d")  return build7d();
+    return [];
+  }, [range, snapshots, currentExpression]); // re-calc when new snapshot arrives
+
+  // ── Merge live into Point[] for uniform rendering ──
+  const liveAsPoints: Point[] = live.map((p) => ({
     label: p.t === 0 ? "jetzt" : `${Math.abs(p.t)}s`,
     happy: p.happy, sad: p.sad, neutral: p.neutral,
     angry: p.angry, surprised: p.surprised, fearful: p.fearful,
   }));
-  const isEmpty = data.length < 2;
+
+  const data = range === "60s" ? liveAsPoints : staticData;
+  // Only empty if truly no data points, or if all values are zero across all points
+  const hasAnyValue = data.some((p) =>
+    EMOTIONS.some((e) => (p[e.key] as number) > 0)
+  );
+  const isEmpty = data.length === 0 || !hasAnyValue;
 
   const toggleEmotion = (key: string) => {
     setHidden((prev) => {
@@ -202,32 +217,86 @@ export function Timeline({ snapshots, currentExpression }: Props) {
 
   return (
     <div className="timeline-container">
-      {isEmpty ? null : (
-        <ResponsiveContainer width="100%" height="100%">
-          <BarChart data={data} margin={{ top: 0, right: 0, left: 0, bottom: 0 }}>
-            <defs>
-              {EMOTIONS.filter((e) => e.key !== "happy").map((e) => (
-                <linearGradient key={`grad-${e.key}`} id={`grad-${e.key}`} x1="0" y1="1" x2="0" y2="0" gradientUnits="userSpaceOnUse">
-                  <stop offset="0" stopColor={e.color} stopOpacity={0.4} />
-                  <stop offset="200" stopColor={e.color} stopOpacity={0} />
-                </linearGradient>
-              ))}
-            </defs>
-            <XAxis dataKey="label" hide />
-            <YAxis hide />
-            {EMOTIONS.map((e) => (
-              <Bar
-                key={e.key}
-                dataKey={e.key}
-                stackId="emotions"
-                fill={e.key === "happy" ? "#2eeaa0" : `url(#grad-${e.key})`}
-                isAnimationActive={false}
-                hide={hidden.has(e.key)}
-                radius={0}
+      {/* ── Header ── */}
+      <div className="timeline-header">
+        <h3 className="section-title">Verlauf</h3>
+        <div className="range-tabs">
+          {(["60s", "60m", "24h", "7d"] as Range[]).map((r) => (
+            <button
+              key={r}
+              className={`range-btn ${range === r ? "range-btn--active" : ""}`}
+              onClick={() => setRange(r)}
+            >
+              {r}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {isEmpty ? (
+        <div className="timeline-empty">
+          <p>Noch keine Daten für diesen Zeitraum.</p>
+        </div>
+      ) : (
+        <>
+          <ResponsiveContainer width="100%" height={195}>
+            <BarChart data={data} margin={{ top: 4, right: 4, left: -22, bottom: 0 }}>
+              <XAxis
+                dataKey="label"
+                tick={{ fontSize: 9, fill: "#475569" }}
+                axisLine={false}
+                tickLine={false}
+                interval={xInterval}
               />
+              <YAxis
+                domain={[0, 100]}
+                tick={{ fontSize: 9, fill: "#475569" }}
+                axisLine={false}
+                tickLine={false}
+                ticks={[0, 25, 50, 75, 100]}
+              />
+              <Tooltip
+                isAnimationActive={false}
+                contentStyle={{
+                  background: "#1e293b",
+                  border: "1px solid #334155",
+                  borderRadius: "8px",
+                  fontSize: "11px",
+                  padding: "6px 10px",
+                }}
+                labelStyle={{ color: "#64748b", marginBottom: 4 }}
+                formatter={(value: number, name: string) => {
+                  const e = EMOTIONS.find((x) => x.key === name);
+                  return [`${value}%`, e ? `${e.emoji}` : name];
+                }}
+              />
+              {EMOTIONS.map((e) => (
+                <Bar
+                  key={e.key}
+                  dataKey={e.key}
+                  stackId="emotions"
+                  fill={e.color}
+                  isAnimationActive={false}
+                  hide={hidden.has(e.key)}
+                  radius={0}
+                />
+              ))}
+            </BarChart>
+          </ResponsiveContainer>
+
+          <div className="timeline-legend">
+            {EMOTIONS.map((e) => (
+              <button
+                key={e.key}
+                className={`legend-btn ${hidden.has(e.key) ? "legend-btn--off" : ""}`}
+                onClick={() => toggleEmotion(e.key)}
+              >
+                <span className="legend-dot" style={{ background: hidden.has(e.key) ? "#334155" : e.color }} />
+                <span className="legend-label">{e.emoji}</span>
+              </button>
             ))}
-          </BarChart>
-        </ResponsiveContainer>
+          </div>
+        </>
       )}
     </div>
   );

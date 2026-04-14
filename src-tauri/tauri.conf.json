@@ -2,7 +2,7 @@
   "$schema": "https://raw.githubusercontent.com/nicholasgasior/tauri/dev/crates/tauri-utils/schema.json",
   "productName": "HappyFace",
   "version": "0.1.0",
-  "identifier": "com.happyface.desktop",
+  "identifier": "com.happyface.app",
   "build": {
     "frontendDist": "../dist",
     "devUrl": "http://localhost:5173",
@@ -11,17 +11,14 @@
   },
   "app": {
     "withGlobalTauri": true,
-    "macOSPrivateApi": false,
     "windows": [
       {
         "title": "HappyFace",
         "width": 380,
-        "height": 507,
-        "minWidth": 280,
-        "minHeight": 373,
+        "height": 520,
         "resizable": true,
-        "decorations": true,
-        "transparent": false,
+        "decorations": false,
+        "transparent": true,
         "visible": false,
         "skipTaskbar": true,
         "alwaysOnTop": true
@@ -33,23 +30,36 @@
   },
   "bundle": {
     "active": true,
-    "targets": "all",
-    "category": "HealthcareAndFitness",
-    "shortDescription": "Private mood tracking with local facial-expression analysis.",
-    "longDescription": "HappyFace is a private macOS menubar app that tracks facial expressions on-device and visualizes mood trends without sending camera data to the cloud.",
-    "macOS": {
-      "minimumSystemVersion": "13.0",
-      "hardenedRuntime": true,
-      "entitlements": "Entitlements.plist",
-      "infoPlist": "Info.plist"
-    },
+    "targets": ["app", "dmg", "nsis", "msi"],
+    "category": "Productivity",
+    "shortDescription": "Track your daily mood via facial expression",
+    "longDescription": "HappyFace is a privacy-first menubar app that detects your facial expression locally via your webcam and visualises your happiness trend over time. Subscribe to Premium for unlimited history and weekly comparisons.",
+    "copyright": "© 2026 HappyFace",
+    "publisher": "HappyFace",
     "icon": [
       "icons/32x32.png",
       "icons/128x128.png",
       "icons/128x128@2x.png",
       "icons/icon.icns",
       "icons/icon.ico"
-    ]
+    ],
+    "macOS": {
+      "minimumSystemVersion": "11.0",
+      "entitlements": "Entitlements.plist"
+    },
+    "windows": {
+      "digestAlgorithm": "sha256",
+      "timestampUrl": "http://timestamp.digicert.com",
+      "tsp": false,
+      "wix": {
+        "language": "en-US"
+      },
+      "nsis": {
+        "installMode": "perUser",
+        "displayLanguageSelector": false,
+        "installerIcon": "icons/icon.ico"
+      }
+    }
   },
   "plugins": {}
 }

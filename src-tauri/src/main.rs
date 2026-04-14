@@ -8,7 +8,7 @@ use std::time::Duration;
 use tauri::{
     image::Image,
     tray::{MouseButton, MouseButtonState, TrayIconBuilder, TrayIconEvent},
-    Emitter, Manager,
+    Emitter, Manager, WebviewUrl, WebviewWindowBuilder,
 };
 
 /// Track whether the window has been positioned initially.
@@ -161,6 +161,41 @@ fn check_camera_status() -> CameraStatus {
 }
 
 #[tauri::command]
+fn get_platform() -> &'static str {
+    #[cfg(target_os = "macos")]
+    { return "macos"; }
+    #[cfg(target_os = "windows")]
+    { return "windows"; }
+    #[cfg(target_os = "linux")]
+    { return "linux"; }
+    #[cfg(not(any(target_os = "macos", target_os = "windows", target_os = "linux")))]
+    { return "unknown"; }
+}
+
+/// Show or hide the screen-edge emotion overlay window.
+#[tauri::command]
+fn set_overlay_visible(visible: bool, app: tauri::AppHandle) {
+    if let Some(window) = app.get_webview_window("overlay") {
+        if visible {
+            // Re-size to current primary monitor before showing
+            if let Ok(Some(monitor)) = window.primary_monitor() {
+                let size = monitor.size();
+                let _ = window.set_size(tauri::Size::Physical(tauri::PhysicalSize {
+                    width: size.width,
+                    height: size.height,
+                }));
+                let _ = window.set_position(tauri::Position::Physical(
+                    tauri::PhysicalPosition { x: 0, y: 0 },
+                ));
+            }
+            let _ = window.show();
+        } else {
+            let _ = window.hide();
+        }
+    }
+}
+
+#[tauri::command]
 fn get_video_call_apps() -> Vec<String> {
     #[cfg(feature = "app-store")]
     {
@@ -191,7 +226,9 @@ fn main() {
         .invoke_handler(tauri::generate_handler![
             check_camera_status,
             get_video_call_apps,
-            update_tray_icon
+            update_tray_icon,
+            set_overlay_visible,
+            get_platform
         ])
         .setup(|app| {
             // ── Tray Icon ──
@@ -231,6 +268,37 @@ fn main() {
                     }
                 })
                 .build(app)?;
+
+            // ── Overlay Window (screen-edge emotion indicator) ──
+            let overlay = WebviewWindowBuilder::new(
+                app,
+                "overlay",
+                WebviewUrl::App("index.html#overlay".into()),
+            )
+            .title("HappyFace Overlay")
+            .transparent(true)
+            .decorations(false)
+            .always_on_top(true)
+            .skip_taskbar(true)
+            .resizable(false)
+            .shadow(false)
+            .visible(false)
+            .build()?;
+
+            // Make the overlay click-through so it never blocks interaction.
+            let _ = overlay.set_ignore_cursor_events(true);
+
+            // Size to primary monitor.
+            if let Ok(Some(monitor)) = overlay.primary_monitor() {
+                let size = monitor.size();
+                let _ = overlay.set_size(tauri::Size::Physical(tauri::PhysicalSize {
+                    width: size.width,
+                    height: size.height,
+                }));
+                let _ = overlay.set_position(tauri::Position::Physical(
+                    tauri::PhysicalPosition { x: 0, y: 0 },
+                ));
+            }
 
             // Hide dock icon on macOS
             #[cfg(target_os = "macos")]

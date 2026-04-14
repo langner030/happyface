@@ -1,62 +1,37 @@
 import { useState } from "react";
-import { type Product } from "@choochmeque/tauri-plugin-iap-api";
-import { PremiumStatusMessage, UpgradePromptKind as PromptType } from "../hooks/usePremium";
-import { t } from "../i18n";
+import { UpgradePrompt as PromptType } from "../hooks/usePremium";
 
 interface Props {
   prompt: PromptType;
   onPurchase: () => Promise<boolean>;
   onRestore: () => Promise<boolean>;
   onDismiss: (prompt: PromptType) => void;
-  canDismiss: boolean;
-  loading?: boolean;
-  product?: Product | null;
-  statusMessage?: PremiumStatusMessage | null;
-  storeReady?: boolean;
 }
 
-export function UpgradePrompt({
-  prompt,
-  onPurchase,
-  onRestore,
-  onDismiss,
-  canDismiss,
-  loading = false,
-  product,
-  statusMessage,
-  storeReady = false,
-}: Props) {
-  const [pendingAction, setPendingAction] = useState<"purchase" | "restore" | null>(null);
+export function UpgradePrompt({ prompt, onPurchase, onRestore, onDismiss }: Props) {
+  const [loading, setLoading] = useState(false);
 
   const handlePurchase = async () => {
-    setPendingAction("purchase");
+    setLoading(true);
     await onPurchase();
-    setPendingAction(null);
+    setLoading(false);
   };
 
   const handleRestore = async () => {
-    setPendingAction("restore");
+    setLoading(true);
     await onRestore();
-    setPendingAction(null);
+    setLoading(false);
   };
 
   const title =
-    prompt === "usage_soft"
-      ? t("upgrade_soft_usage_title")
-      : prompt === "days_soft"
-        ? t("upgrade_soft_day_title")
-        : t("upgrade_hard_usage_title");
+    prompt === "hours"
+      ? "Du nutzt HappyFace gerne?"
+      : "Wochenvergleich freischalten?";
 
   const message =
-    prompt === "usage_soft"
-      ? t("upgrade_soft_usage_message")
-      : prompt === "days_soft"
-        ? t("upgrade_soft_day_message")
-        : t("upgrade_hard_usage_message");
-
-  const ctaLabel = product?.formattedPrice
-    ? `${t("unlock_premium")} ${t("for_price", { price: product.formattedPrice })}`
-    : t("unlock_premium");
+    prompt === "hours"
+      ? "Du hast bereits mehrere Stunden aktiv getrackt. Mit Premium speicherst du unbegrenzt Tage und kannst deine Woche vergleichen."
+      : "Du nutzt HappyFace jetzt seit einer Woche! Möchtest du deine Daten behalten und Wochen vergleichen? In der Free-Version werden nur 5 Tage gespeichert.";
 
   return (
     <div className="upgrade-overlay">
@@ -64,20 +39,22 @@ export function UpgradePrompt({
         <span className="upgrade-icon">⭐</span>
         <h3 className="upgrade-title">{title}</h3>
         <p className="upgrade-message">{message}</p>
-        {prompt === "usage_hard" && (
-          <p className="upgrade-required-note">{t("upgrade_required_note")}</p>
-        )}
 
         <div className="upgrade-features">
           <div className="upgrade-feature">
-            <span>✓</span> {t("upgrade_feature_history")}
+            <span>✓</span> Unbegrenzter Datenverlauf
           </div>
           <div className="upgrade-feature">
-            <span>✓</span> {t("upgrade_feature_weekly")}
+            <span>✓</span> Wochenvergleich &amp; Trends
           </div>
           <div className="upgrade-feature">
-            <span>✓</span> {t("upgrade_feature_stats")}
+            <span>✓</span> Vollständige 7-Tage Statistiken
           </div>
+        </div>
+
+        <div className="upgrade-price">
+          <span className="upgrade-price-amount">5,99 €</span>
+          <span className="upgrade-price-period">/ Monat</span>
         </div>
 
         <button
@@ -85,8 +62,13 @@ export function UpgradePrompt({
           onClick={handlePurchase}
           disabled={loading}
         >
-          {loading && pendingAction === "purchase" ? "…" : ctaLabel}
+          {loading ? "…" : "Premium abonnieren"}
         </button>
+
+        <p className="upgrade-terms">
+          Abo verlängert sich automatisch monatlich für 5,99 €. Jederzeit in
+          den System-Einstellungen kündbar.
+        </p>
 
         <div className="upgrade-secondary">
           <button
@@ -94,20 +76,15 @@ export function UpgradePrompt({
             onClick={handleRestore}
             disabled={loading}
           >
-            {loading && pendingAction === "restore" ? "…" : t("restore_purchase")}
+            Abo wiederherstellen
           </button>
-          {canDismiss && (
-            <button
-              className="upgrade-dismiss-btn"
-              onClick={() => onDismiss(prompt)}
-              disabled={loading}
-            >
-              {t("later")}
-            </button>
-          )}
+          <button
+            className="upgrade-dismiss-btn"
+            onClick={() => onDismiss(prompt)}
+          >
+            Später
+          </button>
         </div>
-        {!storeReady && <p className="upgrade-status">{t("store_unavailable")}</p>}
-        {statusMessage && <p className="upgrade-status">{t(statusMessage)}</p>}
       </div>
     </div>
   );

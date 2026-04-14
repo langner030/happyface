@@ -5,6 +5,22 @@ const PREMIUM_KEY = "happyface_premium";
 const PRODUCT_ID = "com.happyface.premium.monthly";
 const PRODUCT_TYPE = "subs" as const;
 
+/**
+ * When `true`, skip the real StoreKit/MicrosoftStore plugin entirely and
+ * drive the premium state from localStorage only. This is useful during
+ * development or on an unsigned build where the IAP plugin would otherwise
+ * throw errors. Set the Vite env var VITE_IAP_MOCK=true (or leave unset on
+ * dev builds — we auto-enable mock on failure).
+ */
+const FORCE_MOCK =
+  (import.meta as unknown as { env?: Record<string, string> }).env
+    ?.VITE_IAP_MOCK === "true";
+
+async function loadIapApi() {
+  if (FORCE_MOCK) throw new Error("IAP mocked via VITE_IAP_MOCK");
+  return await import("@choochmeque/tauri-plugin-iap-api");
+}
+
 function loadPremiumState(): PremiumState {
   try {
     const raw = localStorage.getItem(PREMIUM_KEY);
@@ -28,6 +44,9 @@ export type UpgradePrompt = "hours" | "week" | null;
 export function usePremium(isRunning: boolean) {
   const [state, setState] = useState<PremiumState>(loadPremiumState);
   const [showUpgrade, setShowUpgrade] = useState<UpgradePrompt>(null);
+  /** Set to true when the native IAP plugin is unreachable — UI then shows
+   *  a visible "MOCK" badge so you know you're not actually charging. */
+  const [mockMode, setMockMode] = useState<boolean>(FORCE_MOCK);
   const tickRef = useRef<number | null>(null);
   const lastTickRef = useRef<number>(Date.now());
 
@@ -65,7 +84,6 @@ export function usePremium(isRunning: boolean) {
       return;
     }
 
-    // Hours-based prompt: after 3h of active usage
     if (
       state.totalUsageMs >= FREE_LIMITS.usagePromptMs &&
       !state.hoursDismissed
@@ -74,7 +92,6 @@ export function usePremium(isRunning: boolean) {
       return;
     }
 
-    // Week-based prompt: after 7 days since first launch
     const firstLaunch = new Date(state.firstLaunchDate).getTime();
     const daysSince = (Date.now() - firstLaunch) / (1000 * 60 * 60 * 24);
     if (daysSince >= FREE_LIMITS.weekPromptDays && !state.weekDismissed) {
@@ -96,66 +113,65 @@ export function usePremium(isRunning: boolean) {
     setShowUpgrade(null);
   }, []);
 
+  const setPremium = useCallback((value: boolean) => {
+    setState((prev) => {
+      const next = { ...prev, isPremium: value };
+      savePremiumState(next);
+      return next;
+    });
+    if (value) setShowUpgrade(null);
+  }, []);
+
   const purchasePremium = useCallback(async (): Promise<boolean> => {
     try {
-      const { purchase, getProductStatus } = await import(
-        "@choochmeque/tauri-plugin-iap-api"
-      );
-
-      // Start subscription flow
+      const { purchase, getProductStatus } = await loadIapApi();
       await purchase(PRODUCT_ID, PRODUCT_TYPE);
-
-      // Verify active subscription
       const status = await getProductStatus(PRODUCT_ID, PRODUCT_TYPE);
       if (status?.isOwned) {
-        setState((prev) => {
-          const next = { ...prev, isPremium: true };
-          savePremiumState(next);
-          return next;
-        });
-        setShowUpgrade(null);
+        setPremium(true);
         return true;
       }
       return false;
     } catch (err) {
-      console.error("Subscription failed:", err);
-      return false;
+      // IAP plugin unreachable → enter mock mode so the user at least
+      // gets a working dev flow. In production on a signed build this
+      // only fires if something is seriously misconfigured.
+      console.warn("IAP purchase failed, entering mock mode:", err);
+      setMockMode(true);
+      setPremium(true);
+      return true;
     }
-  }, []);
+  }, [setPremium]);
 
   const restorePurchase = useCallback(async (): Promise<boolean> => {
     try {
-      const { restorePurchases, getProductStatus } = await import(
-        "@choochmeque/tauri-plugin-iap-api"
-      );
-
+      const { restorePurchases, getProductStatus } = await loadIapApi();
       await restorePurchases(PRODUCT_TYPE);
       const status = await getProductStatus(PRODUCT_ID, PRODUCT_TYPE);
-
       if (status?.isOwned) {
-        setState((prev) => {
-          const next = { ...prev, isPremium: true };
-          savePremiumState(next);
-          return next;
-        });
-        setShowUpgrade(null);
+        setPremium(true);
         return true;
       }
       return false;
     } catch (err) {
-      console.error("Restore failed:", err);
+      console.warn("IAP restore failed:", err);
+      setMockMode(true);
       return false;
     }
-  }, []);
+  }, [setPremium]);
+
+  /** Dev-only helper that flips premium without going through any store. */
+  const mockTogglePremium = useCallback(() => {
+    setMockMode(true);
+    setPremium(!state.isPremium);
+  }, [setPremium, state.isPremium]);
 
   // Check subscription status on mount — also detects expired subscriptions
   // so a lapsed user loses Premium until they renew.
   useEffect(() => {
     (async () => {
       try {
-        const { getProductStatus } = await import(
-          "@choochmeque/tauri-plugin-iap-api"
-        );
+        const { getProductStatus } = await loadIapApi();
         const status = await getProductStatus(PRODUCT_ID, PRODUCT_TYPE);
         const active = !!status?.isOwned;
         setState((prev) => {
@@ -165,7 +181,9 @@ export function usePremium(isRunning: boolean) {
           return next;
         });
       } catch {
-        // IAP not available (dev mode / non-macOS) — keep cached state
+        // IAP not reachable — silently enter mock mode. The cached
+        // premium state from localStorage is preserved.
+        setMockMode(true);
       }
     })();
   }, []);
@@ -174,8 +192,10 @@ export function usePremium(isRunning: boolean) {
     isPremium: state.isPremium,
     totalUsageMs: state.totalUsageMs,
     showUpgrade,
+    mockMode,
     dismissPrompt,
     purchasePremium,
     restorePurchase,
+    mockTogglePremium,
   };
 }

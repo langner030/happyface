@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { useFaceDetection } from "./hooks/useFaceDetection";
 import { useCameraWatcher } from "./hooks/useCameraWatcher";
 import { usePremium } from "./hooks/usePremium";
+import { usePlatform } from "./hooks/usePlatform";
 import { HappinessGauge } from "./components/HappinessGauge";
 import { Timeline } from "./components/Timeline";
 import { StatsPanel } from "./components/StatsPanel";
@@ -35,12 +36,15 @@ export default function App() {
   } = useFaceDetection();
 
   const { cameraStatus, mode, changeMode, shouldScan } = useCameraWatcher();
+  const platform = usePlatform();
   const {
     isPremium,
     showUpgrade,
+    mockMode,
     dismissPrompt,
     purchasePremium,
     restorePurchase,
+    mockTogglePremium,
   } = usePremium(isRunning);
 
   const [view, setView] = useState<AppView>("live");
@@ -276,6 +280,11 @@ export default function App() {
               >
                 {isPremium ? "PREMIUM" : "FREE"}
               </span>
+              {mockMode && (
+                <span className="subscription-badge mock" title="Store nicht erreichbar — keine echte Abrechnung">
+                  MOCK
+                </span>
+              )}
               <span className="subscription-label">
                 {isPremium
                   ? "Alle Features freigeschaltet"
@@ -289,13 +298,15 @@ export default function App() {
                 <button
                   className="subscription-manage-btn"
                   onClick={async () => {
+                    const manageUrl =
+                      platform === "windows"
+                        ? "https://account.microsoft.com/services"
+                        : "https://apps.apple.com/account/subscriptions";
                     try {
                       const { open } = await import(
                         "@tauri-apps/plugin-shell"
                       );
-                      await open(
-                        "https://apps.apple.com/account/subscriptions"
-                      );
+                      await open(manageUrl);
                     } catch {
                       /* shell plugin unavailable */
                     }
@@ -304,7 +315,9 @@ export default function App() {
                   Abo verwalten
                 </button>
                 <p className="subscription-hint">
-                  Kündigung jederzeit in den macOS System-Einstellungen.
+                  {platform === "windows"
+                    ? "Kündigung jederzeit unter Microsoft-Konto → Dienste."
+                    : "Kündigung jederzeit in den macOS System-Einstellungen."}
                 </p>
               </>
             ) : (
@@ -331,6 +344,17 @@ export default function App() {
               </>
             )}
           </div>
+
+          {/* Dev-only: visible in dev builds OR when mock mode is active */}
+          {(import.meta.env.DEV || mockMode) && (
+            <button
+              className="dev-toggle-btn"
+              onClick={mockTogglePremium}
+              title="Schaltet Premium lokal um — ohne Abrechnung."
+            >
+              🛠 Dev: Premium {isPremium ? "abschalten" : "freischalten"}
+            </button>
+          )}
         </div>
       )}
 

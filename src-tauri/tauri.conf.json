@@ -31,13 +31,35 @@
   "bundle": {
     "active": true,
     "targets": ["app", "dmg", "nsis", "msi"],
+    "category": "Productivity",
+    "shortDescription": "Track your daily mood via facial expression",
+    "longDescription": "HappyFace is a privacy-first menubar app that detects your facial expression locally via your webcam and visualises your happiness trend over time. Subscribe to Premium for unlimited history and weekly comparisons.",
+    "copyright": "© 2026 HappyFace",
+    "publisher": "HappyFace",
     "icon": [
       "icons/32x32.png",
       "icons/128x128.png",
       "icons/128x128@2x.png",
       "icons/icon.icns",
       "icons/icon.ico"
-    ]
+    ],
+    "macOS": {
+      "minimumSystemVersion": "11.0",
+      "entitlements": "Entitlements.plist"
+    },
+    "windows": {
+      "digestAlgorithm": "sha256",
+      "timestampUrl": "http://timestamp.digicert.com",
+      "tsp": false,
+      "wix": {
+        "language": "en-US"
+      },
+      "nsis": {
+        "installMode": "perUser",
+        "displayLanguageSelector": false,
+        "installerIcon": "icons/icon.ico"
+      }
+    }
   },
   "plugins": {}
 }

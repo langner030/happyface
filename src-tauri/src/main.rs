@@ -157,6 +157,18 @@ fn check_camera_status() -> CameraStatus {
     }
 }
 
+#[tauri::command]
+fn get_platform() -> &'static str {
+    #[cfg(target_os = "macos")]
+    { return "macos"; }
+    #[cfg(target_os = "windows")]
+    { return "windows"; }
+    #[cfg(target_os = "linux")]
+    { return "linux"; }
+    #[cfg(not(any(target_os = "macos", target_os = "windows", target_os = "linux")))]
+    { return "unknown"; }
+}
+
 /// Show or hide the screen-edge emotion overlay window.
 #[tauri::command]
 fn set_overlay_visible(visible: bool, app: tauri::AppHandle) {
@@ -204,7 +216,8 @@ fn main() {
             check_camera_status,
             get_video_call_apps,
             update_tray_icon,
-            set_overlay_visible
+            set_overlay_visible,
+            get_platform
         ])
         .setup(|app| {
             // ── Tray Icon ──
